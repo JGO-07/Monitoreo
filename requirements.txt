@@ -1,0 +1,20 @@
+# PyTorch CPU: instalar primero con el índice CPU (ver README)
+#   pip install torch==2.15.0 torchvision==0.29.2 --index-url https://download.pytorch.org/whl/cpu
+torch
+torchvision
+fastapi
+uvicorn[standard]
+jinja2
+python-multipart
+opencv-python-headless
+numpy
+pillow
+psutil
+pydantic
+pyyaml
+prometheus_client
+# desarrollo / pruebas
+pytest
+httpx
+# solo para regenerar la secuencia fuente (scripts/preparar_fuente.py)
+scikit-image

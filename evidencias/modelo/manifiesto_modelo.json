@@ -1,0 +1,38 @@
+{
+  "model_ref": "mobilenet_v3_large/IMAGENET1K_V2@sha256:5c1a416349c4",
+  "architecture": "mobilenet_v3_large",
+  "weights": "torchvision MobileNet_V3_Large_Weights.IMAGENET1K_V2",
+  "weights_file": "models/mobilenet_v3_large-5c1a4163.pth",
+  "weights_sha256": "5c1a416349c4cf298f2a6a5e2600ed0ee55e604713578f5e74e6bc8bcaef7997",
+  "weights_url": "https://download.pytorch.org/models/mobilenet_v3_large-5c1a4163.pth",
+  "task": "classification",
+  "output": "softmax 1000 clases (multiclase, una etiqueta por imagen); score = prob. top-1",
+  "num_classes": 1000,
+  "preprocessing": {
+    "color": "BGR->RGB",
+    "resize_short_side": 232,
+    "interpolation": "bilinear",
+    "center_crop": 224,
+    "mean": [
+      0.485,
+      0.456,
+      0.406
+    ],
+    "std": [
+      0.229,
+      0.224,
+      0.225
+    ]
+  },
+  "environment": {
+    "os": "Windows 11 (10.0.26300)",
+    "machine": "AMD64",
+    "processor": "AMD64 Family 25 Model 80 Stepping 0, AuthenticAMD",
+    "cpu_count": 12,
+    "python": "3.13.15",
+    "torch": "2.15.0+cpu",
+    "torchvision": "0.29.2+cpu",
+    "device": "cpu",
+    "torch_threads": 6
+  }
+}

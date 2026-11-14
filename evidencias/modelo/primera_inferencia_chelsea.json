@@ -1,0 +1,36 @@
+{
+  "image": "data/muestras/chelsea.jpg",
+  "model_ref": "mobilenet_v3_large/IMAGENET1K_V2@sha256:5c1a416349c4",
+  "class_id": 285,
+  "class_name": "Egyptian cat",
+  "score": 0.485096,
+  "top5": [
+    {
+      "class_id": 285,
+      "class_name": "Egyptian cat",
+      "score": 0.485096
+    },
+    {
+      "class_id": 281,
+      "class_name": "tabby",
+      "score": 0.186481
+    },
+    {
+      "class_id": 282,
+      "class_name": "tiger cat",
+      "score": 0.178408
+    },
+    {
+      "class_id": 287,
+      "class_name": "lynx",
+      "score": 0.00882
+    },
+    {
+      "class_id": 728,
+      "class_name": "plastic bag",
+      "score": 0.001568
+    }
+  ],
+  "preprocess_ms": 11.172,
+  "inference_ms": 64.469
+}

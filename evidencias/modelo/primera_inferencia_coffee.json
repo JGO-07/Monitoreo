@@ -1,0 +1,36 @@
+{
+  "image": "data/muestras/coffee.jpg",
+  "model_ref": "mobilenet_v3_large/IMAGENET1K_V2@sha256:5c1a416349c4",
+  "class_id": 967,
+  "class_name": "espresso",
+  "score": 0.840793,
+  "top5": [
+    {
+      "class_id": 967,
+      "class_name": "espresso",
+      "score": 0.840793
+    },
+    {
+      "class_id": 968,
+      "class_name": "cup",
+      "score": 0.02688
+    },
+    {
+      "class_id": 504,
+      "class_name": "coffee mug",
+      "score": 0.00975
+    },
+    {
+      "class_id": 969,
+      "class_name": "eggnog",
+      "score": 0.003255
+    },
+    {
+      "class_id": 441,
+      "class_name": "beer glass",
+      "score": 0.002707
+    }
+  ],
+  "preprocess_ms": 16.523,
+  "inference_ms": 63.485
+}
