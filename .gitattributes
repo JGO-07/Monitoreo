@@ -1,0 +1,5 @@
+*.pth binary
+*.jpg binary
+*.png binary
+*.db binary
+* text=auto

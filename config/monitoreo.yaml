@@ -1,0 +1,34 @@
+# Configuración de monitoreo versionada.
+# config_ref = "<config_id>-<sha256 del contenido canónico, 8 hex>" y se guarda en cada evento y alerta.
+# La fuente visual se declara aparte (escenarios/*.yaml o CLI) para que C1 y C2 compartan
+# exactamente esta misma política: modelo, muestreo, umbrales, referencia, ventanas, reglas y captura.
+
+config_id: mon-v1
+
+model:
+  weights_file: models/mobilenet_v3_large-5c1a4163.pth
+  expected_model_ref: mobilenet_v3_large/IMAGENET1K_V2@sha256:5c1a416349c4
+  num_threads: 2
+
+sampling:
+  # Política: se infiere 1 de cada `infer_every_n` frames recibidos (los demás se descartan
+  # con motivo "sampling"). Si la cola de inferencia está llena, el frame se descarta con motivo
+  # "saturation". Los frames con error de lectura se registran con motivo "read_error".
+  infer_every_n: 2
+  queue_max: 8
+
+thresholds:
+  # PROVISIONAL hasta registrar la corrida de referencia (hito 3).
+  # Zonas: s < lower -> low ; lower <= s < upper -> doubt ; s >= upper -> accepted.
+  lower: 0.30
+  upper: 0.60
+
+capture:
+  # Imágenes conservadas sin expiración automática en <store>/capturas/<run_id>/.
+  low_every_n: 1        # todas las de baja confianza
+  doubt_every_n: 3      # una de cada 3 dudosas (contador por zona)
+  accepted_every_n: 15  # muestra de operación normal
+  jpeg_quality: 90
+
+resources:
+  sample_interval_s: 1.0

@@ -56,6 +56,87 @@ def cmd_infer(args: argparse.Namespace) -> int:
     return 0
 
 
+def _load_source(args: argparse.Namespace):
+    """Fuente desde un manifiesto de escenario (--scenario-file) o desde flags."""
+    import yaml
+
+    from .config import SourceCfg, resolve
+
+    gaps, scenario, notes = {}, args.scenario, None
+    if args.scenario_file:
+        spec = yaml.safe_load(resolve(args.scenario_file).read_text(encoding="utf-8"))
+        src = SourceCfg(**spec["source"])
+        gaps = {int(g["at_seq"]): float(g["seconds"]) for g in spec.get("gaps", [])}
+        scenario = scenario or spec.get("scenario")
+        notes = spec.get("description")
+    else:
+        src = SourceCfg(source_id=args.source_id, kind=args.kind, path=args.path, device=args.device,
+                        fps=args.fps, loop=args.loop)
+    if args.max_frames is not None:
+        src.max_frames = args.max_frames
+    if args.duration is not None:
+        src.duration_s = args.duration
+    return src, gaps, scenario or "adhoc", notes
+
+
+def cmd_run(args: argparse.Namespace) -> int:
+    from .config import load_config, resolve
+    from .pipeline import Pipeline
+    from .store import Store
+
+    cfg = load_config(args.config)
+    src, gaps, scenario, notes = _load_source(args)
+    store = Store(resolve(args.store))
+    factory = None
+    try:
+        from .rules import RuleEngine  # disponible a partir del hito 3
+        if cfg.alerts:
+            factory = lambda p: RuleEngine(p.cfg, p.store, p.run_id)  # noqa: E731
+    except ImportError:
+        pass
+    pipe = Pipeline(cfg, src, store, scenario=scenario, gaps=gaps, rule_engine_factory=factory, notes=notes)
+    print(f"run_id={pipe.run_id} config_ref={cfg.config_ref} model_ref={pipe.clf.model_ref} store={store.root}")
+    try:
+        pipe.run()
+    except KeyboardInterrupt:
+        pipe.stop()
+        pipe.wait()
+    summary = store.query(
+        "SELECT outcome, COUNT(*) n FROM frames WHERE run_id=? GROUP BY outcome", (pipe.run_id,))
+    zones = store.query("SELECT COALESCE(zone, status) z, COUNT(*) n FROM events WHERE run_id=? GROUP BY z",
+                        (pipe.run_id,))
+    alerts = store.query("SELECT rule_id, severity, status FROM alerts WHERE run_id=?", (pipe.run_id,))
+    print(json.dumps({"run_id": pipe.run_id, "frames": summary, "events": zones, "alerts": alerts}, indent=2))
+    return 0
+
+
+def cmd_record(args: argparse.Namespace) -> int:
+    """Graba la webcam como secuencia de imágenes a fps fijo (fuente reproducible)."""
+    import time
+
+    from .config import SourceCfg, resolve
+    from .sources import open_source
+
+    out = resolve(args.out)
+    out.mkdir(parents=True, exist_ok=True)
+    src = SourceCfg(source_id="webcam-grabacion", kind="webcam", device=args.device, fps=args.fps,
+                    duration_s=args.seconds)
+    n = 0
+    print(f"Grabando {args.seconds}s a {args.fps} fps en {out} ... (Ctrl+C para terminar)")
+    try:
+        for raw in open_source(src):
+            if raw.image is not None:
+                cv2.imwrite(str(out / f"{args.prefix}{raw.seq:05d}.jpg"), raw.image, [cv2.IMWRITE_JPEG_QUALITY, 90])
+                n += 1
+    except KeyboardInterrupt:
+        pass
+    (out / "GRABACION.json").write_text(json.dumps({
+        "device": args.device, "fps": args.fps, "frames": n, "recorded_at": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
+    }, indent=2), encoding="utf-8")
+    print(f"{n} frames guardados")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="monitoreo")
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -70,6 +151,29 @@ def build_parser() -> argparse.ArgumentParser:
     s = sub.add_parser("infer", help="Inferencia real sobre una imagen")
     s.add_argument("--image", required=True)
     s.set_defaults(func=cmd_infer)
+
+    s = sub.add_parser("run", help="Ejecuta el pipeline de monitoreo sobre una fuente")
+    s.add_argument("--config", default="config/monitoreo.yaml")
+    s.add_argument("--store", default="var/store", help="Carpeta con monitoreo.db y capturas/")
+    s.add_argument("--scenario-file", help="Manifiesto YAML del escenario (fuente, huecos, descripción)")
+    s.add_argument("--scenario", help="Nombre del escenario (por defecto, el del manifiesto)")
+    s.add_argument("--kind", choices=["sequence", "video", "webcam"], default="sequence")
+    s.add_argument("--path", help="Carpeta de imágenes o archivo de video")
+    s.add_argument("--device", type=int, default=0)
+    s.add_argument("--source-id", default="fuente-local-01")
+    s.add_argument("--fps", type=float, default=4.0)
+    s.add_argument("--loop", action="store_true")
+    s.add_argument("--max-frames", type=int)
+    s.add_argument("--duration", type=float, help="Segundos máximos de captura")
+    s.set_defaults(func=cmd_run)
+
+    s = sub.add_parser("record", help="Graba la webcam como secuencia de imágenes")
+    s.add_argument("--out", required=True)
+    s.add_argument("--device", type=int, default=0)
+    s.add_argument("--fps", type=float, default=4.0)
+    s.add_argument("--seconds", type=float, default=60.0)
+    s.add_argument("--prefix", default="frame_")
+    s.set_defaults(func=cmd_record)
     return p
 
 
