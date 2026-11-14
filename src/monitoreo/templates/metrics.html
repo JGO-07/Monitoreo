@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Inventario de métricas · Centro de monitoreo CV{% endblock %}
+{% block content %}
+<h1>Inventario de métricas (G1–G7)</h1>
+<p class="muted">Una métrica base por grupo; las demás son adicionales. Definiciones completas y aplicabilidad en <code>docs/metricas.md</code>.</p>
+<table>
+<tr><th>Grupo</th><th>ID</th><th>Tipo</th><th>Unidad</th><th>Definición</th><th>Fórmula</th><th>Población / ventana</th><th>Exclusiones · cero observaciones</th><th>Instrumentación</th></tr>
+{% for m in registry %}
+<tr><td>{{ m.group }}</td><td class="mono">{{ m.id }}</td><td>{{ 'base' if m.base else 'adicional' }}</td><td>{{ m.unit }}</td><td>{{ m.definition }}</td>
+<td><code>{{ m.formula }}</code></td><td>{{ m.population }} · {{ m.window }}</td><td>{{ m.exclusions }} · {{ m.zero_obs }}</td><td>{{ m.instrumentation }}</td></tr>
+{% endfor %}
+</table>
+{% endblock %}

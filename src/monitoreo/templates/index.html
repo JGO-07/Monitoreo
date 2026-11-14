@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Resumen</h1>
+<div class="card">
+  <h2 style="margin-top:0">Alertas activas ({{ active|length }})</h2>
+  {% if active %}
+  <table><tr><th>Momento</th><th>Alerta</th><th>Regla</th><th>Severidad</th><th>Motivo</th></tr>
+  {% for a in active %}<tr><td>{{ a.timestamp|ts }}</td><td><a href="/alertas/{{ a.alert_id }}">{{ a.alert_id }}</a></td>
+  <td>{{ a.rule_id }}</td><td><span class="badge s-{{ a.severity }}">{{ a.severity }}</span></td><td>{{ a.reason }}</td></tr>{% endfor %}
+  </table>
+  {% else %}<div class="empty">No hay alertas activas.</div>{% endif %}
+</div>
+
+<h2>Corridas</h2>
+{% if summary %}
+<table>
+<tr><th>Corrida</th><th>Escenario</th><th>Inicio</th><th>Estado</th><th class="num">Eventos</th><th class="num">low</th>
+<th class="num">doubt</th><th class="num">accepted</th><th class="num">error</th><th class="num">Alertas</th><th></th></tr>
+{% for r in summary %}
+<tr><td><a href="/corridas/{{ r.run_id }}" class="mono">{{ r.run_id }}</a></td><td>{{ r.scenario }}</td><td>{{ r.started_at|ts }}</td>
+<td>{{ r.status }}</td><td class="num">{{ r.n }}</td><td class="num">{{ r.n_low or 0 }}</td><td class="num">{{ r.n_doubt or 0 }}</td>
+<td class="num">{{ r.n_acc or 0 }}</td><td class="num">{{ r.n_err or 0 }}</td><td class="num">{{ r.n_alerts }}</td>
+<td><a href="/eventos?run_id={{ r.run_id }}">eventos</a> · <a href="/alertas?run_id={{ r.run_id }}">alertas</a></td></tr>
+{% endfor %}
+</table>
+{% else %}<div class="empty">El store no tiene corridas todavía.</div>{% endif %}
+
+<h2>Últimas alertas</h2>
+{% if recent %}
+<table><tr><th>Momento</th><th>Alerta</th><th>Regla</th><th>Severidad</th><th>Estado</th></tr>
+{% for a in recent %}<tr><td>{{ a.timestamp|ts }}</td><td><a href="/alertas/{{ a.alert_id }}">{{ a.alert_id }}</a></td><td>{{ a.rule_id }}</td>
+<td><span class="badge s-{{ a.severity }}">{{ a.severity }}</span></td><td><span class="badge st-{{ a.status }}">{{ a.status }}</span></td></tr>{% endfor %}
+</table>
+{% else %}<div class="empty">Sin alertas registradas.</div>{% endif %}
+{% endblock %}

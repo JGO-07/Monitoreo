@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}En vivo · Centro de monitoreo CV{% endblock %}
+{% block content %}
+<h1>Stream en vivo · <span class="mono">{{ run_id }}</span></h1>
+<div class="grid">
+<div class="card"><img class="big" src="/en-vivo/stream.mjpg" alt="stream en vivo"></div>
+<div class="card" id="last"><p class="muted">Esperando inferencias…</p></div>
+</div>
+<script>
+async function refresh() {
+  try {
+    const r = await fetch('/api/events?run_id={{ run_id }}&limit=1&offset=' + Math.max(0, (window._n || 1) - 1));
+    const d = await r.json(); window._n = d.total;
+    if (d.items.length) {
+      const e = d.items[0];
+      document.getElementById('last').innerHTML =
+        `<dl class="kv"><dt>Evento</dt><dd><a href="/eventos/${e.event_id}">${e.event_id}</a></dd>` +
+        `<dt>Clase</dt><dd>${e.class_name ?? '—'}</dd><dt>Score</dt><dd>${e.score?.toFixed(3) ?? '—'}</dd>` +
+        `<dt>Zona</dt><dd><span class="badge z-${e.zone ?? 'none'}">${e.zone ?? e.status}</span></dd>` +
+        `<dt>Inferencia</dt><dd>${e.inference_ms?.toFixed(1)} ms</dd><dt>Eventos</dt><dd>${d.total}</dd></dl>`;
+    }
+  } catch (err) {}
+}
+setInterval(refresh, 1000); refresh();
+</script>
+{% endblock %}

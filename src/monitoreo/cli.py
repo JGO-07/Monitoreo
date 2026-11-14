@@ -176,6 +176,73 @@ def cmd_reference(args: argparse.Namespace) -> int:
     return 0
 
 
+def _scenario_spec(path: str | None) -> dict | None:
+    import yaml
+
+    from .config import resolve
+
+    return yaml.safe_load(resolve(path).read_text(encoding="utf-8")) if path else None
+
+
+def cmd_metrics(args: argparse.Namespace) -> int:
+    from . import metrics
+    from .config import load_config, resolve
+    from .store import Store
+
+    store = Store(resolve(args.store))
+    ctx = metrics.context_for(store, args.run_id, load_config(args.config), _scenario_spec(args.scenario_file))
+    res = metrics.compute_all(store, args.run_id, ctx, only_base=args.base)
+    if args.inventory:
+        metrics.write_inventory(resolve(args.inventory))
+    for k, v in res.items():
+        val = v["value"]
+        print(f"{k:40s} {'BASE' if v['base'] else '    '} {('null' if val is None else f'{val:.4g}'):>10s} "
+              f"{v['unit']:16s} n={v['n']}  {v['status']}")
+    return 0
+
+
+def cmd_export(args: argparse.Namespace) -> int:
+    from . import metrics
+    from .config import load_config, resolve
+    from .export import export_run
+    from .store import Store
+
+    store = Store(resolve(args.store))
+    ctx = metrics.context_for(store, args.run_id, load_config(args.config), _scenario_spec(args.scenario_file))
+    doc = export_run(store, args.run_id, resolve(args.out), ctx)
+    print(f"Exportado {args.run_id} -> {args.out} ({len(doc['metrics'])} métricas)")
+    return 0
+
+
+def cmd_serve(args: argparse.Namespace) -> int:
+    import threading
+
+    import uvicorn
+
+    from .config import load_config, resolve
+    from .portal import create_app
+    from .store import Store
+
+    live = None
+    if args.live:
+        from .pipeline import Pipeline
+        from .rules import RuleEngine
+
+        cfg = load_config(args.config)
+        src, gaps, scenario, notes = _load_source(args)
+        pstore = Store(resolve(args.store))
+        live = Pipeline(cfg, src, pstore, scenario=scenario, gaps=gaps, notes=notes,
+                        rule_engine_factory=(lambda p: RuleEngine(p.cfg, p.store, p.run_id)) if cfg.alerts else None)
+        threading.Thread(target=live.run, daemon=True, name="pipeline").start()
+        print(f"Pipeline en vivo: {live.run_id}")
+    app = create_app(resolve(args.store), live=live)
+    uvicorn.run(app, host=args.host, port=args.port, log_level="warning")
+    if live is not None and not live.finished:
+        live.stop()
+        live.wait()
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="monitoreo")
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -226,6 +293,38 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--run-id", help="Por defecto, la última corrida con escenario 'referencia'")
     s.add_argument("--config", default="config/monitoreo.yaml")
     s.set_defaults(func=cmd_reference)
+
+    for name, fn, hlp in (("metrics", cmd_metrics, "Calcula las métricas G1–G7 de una corrida"),
+                          ("export", cmd_export, "Exporta una corrida a CSV/JSONL/JSON recalculables")):
+        s = sub.add_parser(name, help=hlp)
+        s.add_argument("--store", default="var/store")
+        s.add_argument("--run-id", required=True)
+        s.add_argument("--config", default="config/monitoreo.yaml")
+        s.add_argument("--scenario-file", help="Manifiesto del escenario (para métricas con condición declarada)")
+        if name == "metrics":
+            s.add_argument("--base", action="store_true", help="Solo métricas base")
+            s.add_argument("--inventory", help="Escribe el inventario de definiciones en esta ruta JSON")
+        else:
+            s.add_argument("--out", required=True)
+        s.set_defaults(func=fn)
+
+    s = sub.add_parser("serve", help="Inicia el portal (opcionalmente con un pipeline en vivo)")
+    s.add_argument("--store", default="evidencias/almacen")
+    s.add_argument("--host", default="127.0.0.1")
+    s.add_argument("--port", type=int, default=8000)
+    s.add_argument("--live", action="store_true", help="Ejecuta además un pipeline sobre la fuente indicada")
+    s.add_argument("--config", default="config/monitoreo.yaml")
+    s.add_argument("--scenario-file")
+    s.add_argument("--scenario")
+    s.add_argument("--kind", choices=["sequence", "video", "webcam"], default="webcam")
+    s.add_argument("--path")
+    s.add_argument("--device", type=int, default=0)
+    s.add_argument("--source-id", default="webcam-escritorio-01")
+    s.add_argument("--fps", type=float, default=4.0)
+    s.add_argument("--loop", action="store_true")
+    s.add_argument("--max-frames", type=int)
+    s.add_argument("--duration", type=float)
+    s.set_defaults(func=cmd_serve)
     return p
 
 

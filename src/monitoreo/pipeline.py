@@ -62,6 +62,7 @@ class Pipeline:
         self.rules = rule_engine_factory(self) if rule_engine_factory else None
         self.threads: list[threading.Thread] = []
         self.error: BaseException | None = None
+        self.finished = False
 
     # ---- ciclo de vida ----------------------------------------------------------
     def _register(self) -> None:
@@ -118,6 +119,7 @@ class Pipeline:
         status = "failed" if self.error else ("stopped" if getattr(self, "_stopped_by_user", False)
                                               else "completed")
         self.store.execute("UPDATE runs SET ended_at=?, status=? WHERE run_id=?", (time.time(), status, self.run_id))
+        self.finished = True
 
     def run(self) -> str:
         self.start()

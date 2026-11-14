@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Alertas · Centro de monitoreo CV{% endblock %}
+{% block content %}
+<h1>Alertas</h1>
+<form class="filters" method="get" action="/alertas">
+  <label>Corrida<select name="run_id"><option value="">todas</option>
+    {% for r in runs %}<option value="{{ r.run_id }}" {{ 'selected' if f.run_id == r.run_id }}>{{ r.run_id }}</option>{% endfor %}</select></label>
+  <label>Regla<select name="rule_id"><option value="">todas</option>
+    {% for r in rules %}<option {{ 'selected' if f.rule_id == r }}>{{ r }}</option>{% endfor %}</select></label>
+  <label>Severidad<select name="severity"><option value="">todas</option>
+    {% for s in ['critical','warning','info'] %}<option {{ 'selected' if f.severity == s }}>{{ s }}</option>{% endfor %}</select></label>
+  <label>Estado<select name="status"><option value="">todos</option>
+    {% for s in ['active','resolved'] %}<option {{ 'selected' if f.status == s }}>{{ s }}</option>{% endfor %}</select></label>
+  <button>Filtrar</button> <a href="/alertas">limpiar</a>
+</form>
+<p class="muted">{{ rows|length }} alerta(s)</p>
+{% if rows %}
+<table>
+<tr><th>Momento</th><th>Alerta</th><th>Regla</th><th>Severidad</th><th>Estado</th><th>Motivo</th><th>Acción sugerida</th><th class="num">Eventos</th></tr>
+{% for a in rows %}
+<tr><td>{{ a.timestamp|ts }}</td><td><a class="mono" href="/alertas/{{ a.alert_id }}">{{ a.alert_id }}</a></td><td>{{ a.rule_id }}</td>
+<td><span class="badge s-{{ a.severity }}">{{ a.severity }}</span></td><td><span class="badge st-{{ a.status }}">{{ a.status }}</span></td>
+<td>{{ a.reason }}</td><td>{{ a.suggested_action }}</td><td class="num">{{ (a.event_ids_json|fromjson)|length }}</td></tr>
+{% endfor %}
+</table>
+{% else %}
+<div class="empty">Ninguna alerta cumple los filtros. Que no haya alertas no prueba operación normal: revisa las ventanas evaluadas en la corrida.</div>
+{% endif %}
+{% endblock %}

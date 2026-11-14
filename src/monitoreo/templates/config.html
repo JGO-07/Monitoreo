@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}{{ c.config_ref }} · Centro de monitoreo CV{% endblock %}
+{% block content %}
+<h1>Configuración <span class="mono">{{ c.config_ref }}</span></h1>
+<p class="muted">Archivo {{ c.source_path }} · registrada {{ c.created_at|ts }} · config_ref = id + SHA-256 (8 hex) del contenido canónico.</p>
+<h2>Corridas que la usaron</h2>
+<ul>{% for u in used %}<li><a class="mono" href="/corridas/{{ u.run_id }}">{{ u.run_id }}</a> ({{ u.scenario }})</li>{% endfor %}</ul>
+<h2>YAML</h2>
+<pre>{{ c.raw_yaml }}</pre>
+<h2>Contenido canónico (base del hash)</h2>
+<pre>{{ c.canonical_json }}</pre>
+{% endblock %}

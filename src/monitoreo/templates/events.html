@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Eventos · Centro de monitoreo CV{% endblock %}
+{% block content %}
+<h1>Eventos de inferencia</h1>
+<form class="filters" method="get" action="/eventos">
+  <label>Corrida<select name="run_id"><option value="">todas</option>
+    {% for r in runs %}<option value="{{ r.run_id }}" {{ 'selected' if f.run_id == r.run_id }}>{{ r.run_id }}</option>{% endfor %}</select></label>
+  <label>Zona<select name="zone"><option value="">todas</option>
+    {% for z in zones %}<option {{ 'selected' if f.zone == z }}>{{ z }}</option>{% endfor %}</select></label>
+  <label>Estado<select name="status"><option value="">todos</option>
+    {% for s in ['ok','error','no_score'] %}<option {{ 'selected' if f.status == s }}>{{ s }}</option>{% endfor %}</select></label>
+  <label>Clase contiene<input name="class_name" value="{{ f.class_name }}" size="14"></label>
+  <label>Fuente<select name="source_id"><option value="">todas</option>
+    {% for s in sources %}<option {{ 'selected' if f.source_id == s }}>{{ s }}</option>{% endfor %}</select></label>
+  <label>Captura<select name="has_image"><option value="">indiferente</option>
+    <option value="1" {{ 'selected' if f.has_image == '1' }}>con imagen</option><option value="0" {{ 'selected' if f.has_image == '0' }}>sin imagen</option></select></label>
+  <label>Desde<input type="datetime-local" step="1" name="since" value="{{ f.since }}"></label>
+  <label>Hasta<input type="datetime-local" step="1" name="until" value="{{ f.until }}"></label>
+  <button>Filtrar</button> <a href="/eventos">limpiar</a>
+  <a href="/api/events.csv?{{ qs }}">exportar CSV</a>
+</form>
+<p class="muted">{{ total }} evento(s) · página {{ page }} de {{ pages }}</p>
+{% if rows %}
+<table>
+<tr><th>Momento (recepción)</th><th>Evento</th><th>Fuente</th><th class="num">Frame</th><th>Estado</th><th>Clase top-1</th>
+<th class="num">Score</th><th>Zona</th><th>Captura</th><th>Config</th></tr>
+{% for e in rows %}
+<tr>
+<td>{{ e.timestamp|ts }}</td>
+<td><a class="mono" href="/eventos/{{ e.event_id }}">{{ e.event_id }}</a></td>
+<td>{{ e.source_id }}</td><td class="num">{{ e.seq }}</td><td>{{ e.status }}</td>
+<td>{{ e.class_name or '—' }}</td><td class="num">{{ e.score|num }}</td>
+<td><span class="badge z-{{ e.zone or 'none' }}">{{ e.zone or e.status }}</span></td>
+<td>{% if e.image_ref %}<a href="/capturas/{{ e.image_ref[9:] }}"><img class="thumb" loading="lazy" src="/capturas/{{ e.image_ref[9:] }}" alt="captura {{ e.frame_id }}"></a>{% else %}<span class="muted">—</span>{% endif %}</td>
+<td><a class="mono" href="/config/{{ e.config_ref }}">{{ e.config_ref }}</a></td>
+</tr>
+{% endfor %}
+</table>
+<div class="pager">
+  {% if page > 1 %}<a href="/eventos?{{ qs }}&page={{ page - 1 }}">← anterior</a>{% endif %}
+  {% if page < pages %}<a href="/eventos?{{ qs }}&page={{ page + 1 }}">siguiente →</a>{% endif %}
+</div>
+{% else %}
+<div class="empty">Ningún evento cumple los filtros.</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}{{ ev.event_id }} · Centro de monitoreo CV{% endblock %}
+{% block content %}
+<p><a href="/eventos?run_id={{ ev.run_id }}">← eventos de la corrida</a></p>
+<h1>Evento <span class="mono">{{ ev.event_id }}</span> <span class="badge z-{{ ev.zone or 'none' }}">{{ ev.zone or ev.status }}</span></h1>
+<div class="grid">
+<div class="card">
+<dl class="kv">
+  <dt>event_id</dt><dd class="mono">{{ ev.event_id }}</dd>
+  <dt>run_id</dt><dd><a class="mono" href="/corridas/{{ ev.run_id }}">{{ ev.run_id }}</a> ({{ run.scenario }})</dd>
+  <dt>frame_id</dt><dd class="mono">{{ ev.frame_id }} · origen <code>{{ frame.origin }}</code> · outcome {{ frame.outcome }}</dd>
+  <dt>timestamp (recepción)</dt><dd>{{ ev.timestamp|ts }} <span class="muted">({{ ev.timestamp }})</span></dd>
+  <dt>source_id</dt><dd>{{ ev.source_id }}</dd>
+  <dt>task</dt><dd>{{ ev.task }}</dd>
+  <dt>model_ref</dt><dd class="mono">{{ ev.model_ref }}</dd>
+  <dt>config_ref</dt><dd><a class="mono" href="/config/{{ ev.config_ref }}">{{ ev.config_ref }}</a></dd>
+  <dt>status</dt><dd>{{ ev.status }}{% if ev.error %} · <code>{{ ev.error }}</code>{% endif %}</dd>
+  <dt>predicción</dt><dd>{{ ev.class_name or '—' }} (class_id {{ ev.class_id if ev.class_id is not none else '—' }})</dd>
+  <dt>score</dt><dd>{{ ev.score|num(4) }}</dd>
+  <dt>umbrales usados</dt><dd>inferior {{ ev.lower_threshold }} · superior {{ ev.upper_threshold }} → zona <b>{{ ev.zone or '—' }}</b></dd>
+  <dt>tiempos</dt><dd>cola {{ ev.queue_ms|num(1) }} ms · preprocesamiento {{ ev.preprocess_ms|num(1) }} ms · inferencia {{ ev.inference_ms|num(1) }} ms · extremo a extremo {{ ev.e2e_ms|num(1) }} ms</dd>
+  <dt>image_ref</dt><dd class="mono">{{ ev.image_ref or 'sin captura (política selectiva)' }}</dd>
+  <dt>image_sha256</dt><dd class="mono">{{ ev.image_sha256 or '—' }}</dd>
+</dl>
+</div>
+<div class="card">
+{% if ev.image_ref %}
+  {% if image_ok %}<img class="big" src="/capturas/{{ ev.image_ref[9:] }}" alt="captura del frame {{ ev.frame_id }}">
+  {% else %}<div class="empty">La referencia <code>{{ ev.image_ref }}</code> no resuelve a un archivo.</div>{% endif %}
+{% else %}<div class="empty">Este evento no tiene captura según la política de captura por zona.</div>{% endif %}
+<h2>Top-5 del modelo</h2>
+{% for t in top5 %}
+<div style="display:grid;grid-template-columns:180px 1fr 60px;gap:8px;align-items:center;margin:3px 0">
+<span>{{ t.class_name }}</span><div class="bar"><i style="width:{{ (t.score*100)|round(1) }}%"></i></div><span class="num">{{ '%.3f'|format(t.score) }}</span></div>
+{% else %}<p class="muted">Sin salida del modelo.</p>{% endfor %}
+</div>
+</div>
+
+<h2>Ventana que contiene este evento</h2>
+{% if windows %}
+<table><tr><th>Regla</th><th>Ventana</th><th class="num">n elegibles</th><th class="num">n low</th><th class="num">low_rate</th><th>Estado</th><th class="num">Racha</th></tr>
+{% for w in windows %}<tr><td>{{ w.rule_id }}</td><td>{{ w.window_start|ts }} → {{ w.window_end|ts }}</td><td class="num">{{ w.n_eligible }}</td>
+<td class="num">{{ w.n_low }}</td><td class="num">{{ w.low_rate|num }}</td><td><span class="badge w-{{ w.state }}">{{ w.state }}</span></td><td class="num">{{ w.streak }}</td></tr>{% endfor %}
+</table>
+{% else %}<div class="empty">No hay ventanas evaluadas para este instante.</div>{% endif %}
+
+<h2>Alertas que incluyen este evento</h2>
+{% if alerts %}
+<ul>{% for a in alerts %}<li><a href="/alertas/{{ a.alert_id }}">{{ a.alert_id }}</a> · {{ a.rule_id }} · <span class="badge s-{{ a.severity }}">{{ a.severity }}</span></li>{% endfor %}</ul>
+{% else %}<div class="empty">Ninguna alerta referencia este evento.</div>{% endif %}
+<p><a href="/api/events/{{ ev.event_id }}">ver JSON</a></p>
+{% endblock %}

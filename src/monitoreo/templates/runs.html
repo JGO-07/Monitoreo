@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Corridas · Centro de monitoreo CV{% endblock %}
+{% block content %}
+<h1>Corridas</h1>
+{% if rows %}
+<table><tr><th>Corrida</th><th>Escenario</th><th>Inicio</th><th>Fin</th><th>Estado</th><th>Fuente</th><th>Config</th><th>Commit</th></tr>
+{% for r in rows %}<tr><td><a class="mono" href="/corridas/{{ r.run_id }}">{{ r.run_id }}</a></td><td>{{ r.scenario }}</td><td>{{ r.started_at|ts }}</td>
+<td>{{ r.ended_at|ts }}</td><td>{{ r.status }}</td><td>{{ r.source_id }}</td><td><a class="mono" href="/config/{{ r.config_ref }}">{{ r.config_ref }}</a></td>
+<td class="mono">{{ (r.git_commit or '—')[:10] }}</td></tr>{% endfor %}
+</table>
+{% else %}<div class="empty">Sin corridas.</div>{% endif %}
+{% endblock %}

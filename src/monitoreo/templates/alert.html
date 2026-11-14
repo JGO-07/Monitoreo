@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}{{ a.alert_id }} · Centro de monitoreo CV{% endblock %}
+{% block content %}
+<p><a href="/alertas?run_id={{ a.run_id }}">← alertas de la corrida</a></p>
+<h1>Alerta <span class="mono">{{ a.alert_id }}</span> <span class="badge s-{{ a.severity }}">{{ a.severity }}</span> <span class="badge st-{{ a.status }}">{{ a.status }}</span></h1>
+<div class="card">
+<dl class="kv">
+  <dt>Regla</dt><dd><b>{{ a.rule_id }}</b> ({{ evidence.rule_kind }})</dd>
+  <dt>Momento de disparo</dt><dd>{{ a.timestamp|ts }}</dd>
+  <dt>Última ventana en incumplimiento</dt><dd>{{ a.last_seen|ts }}</dd>
+  <dt>Resuelta</dt><dd>{{ a.resolved_at|ts if a.resolved_at else 'no (activa al cierre)' }}</dd>
+  <dt>Motivo</dt><dd>{{ a.reason }}</dd>
+  <dt>Acción sugerida</dt><dd>{{ a.suggested_action }}</dd>
+  <dt>Corrida</dt><dd><a class="mono" href="/corridas/{{ a.run_id }}">{{ a.run_id }}</a></dd>
+  <dt>Configuración</dt><dd><a class="mono" href="/config/{{ a.config_ref }}">{{ a.config_ref }}</a> · umbrales {{ evidence.lower_threshold }} / {{ evidence.upper_threshold }} · ventana {{ evidence.window_size_s }} s · mínimo {{ evidence.min_observations }} obs.</dd>
+  <dt>Referencia</dt><dd class="mono">{{ evidence.reference_ref or '—' }}</dd>
+  <dt>Intervalo</dt><dd>{{ a.window_start|ts }} → {{ a.window_end|ts }}</dd>
+  <dt>Parámetros de la regla</dt><dd><code>{{ evidence.rule | pretty }}</code></dd>
+</dl>
+</div>
+
+<h2>Ventanas que originaron la alerta</h2>
+<table><tr><th>Ventana</th><th class="num">n elegibles</th><th class="num">n low</th><th class="num">low_rate</th><th class="num">score medio</th><th>Estado</th><th class="num">Racha</th></tr>
+{% for w in windows %}<tr><td>{{ w.window_start|ts }} → {{ w.window_end|ts }}</td><td class="num">{{ w.n_eligible }}</td><td class="num">{{ w.n_low }}</td>
+<td class="num">{{ w.low_rate|num }}</td><td class="num">{{ w.mean_score|num }}</td><td><span class="badge w-{{ w.state }}">{{ w.state }}</span></td><td class="num">{{ w.streak }}</td></tr>{% endfor %}
+</table>
+
+<h2>Consulta reproducible de los eventos</h2>
+<pre>{{ a.query }}</pre>
+
+<h2>Eventos vinculados ({{ evs|length }}; {{ n_captured }} con captura)</h2>
+<div class="gallery">
+{% for e in evs if e.image_ref %}
+<figure><a href="/eventos/{{ e.event_id }}"><img class="thumb" loading="lazy" src="/capturas/{{ e.image_ref[9:] }}" alt="{{ e.event_id }}"></a>
+<figcaption><span class="badge z-{{ e.zone }}">{{ e.score|num(2) }}</span> {{ e.class_name[:14] }}</figcaption></figure>
+{% endfor %}
+</div>
+<table style="margin-top:10px">
+<tr><th>Evento</th><th class="num">Frame</th><th>Momento</th><th>Clase</th><th class="num">Score</th><th>Zona</th><th>Captura</th></tr>
+{% for e in evs %}<tr><td><a class="mono" href="/eventos/{{ e.event_id }}">{{ e.event_id }}</a></td><td class="num">{{ e.seq }}</td><td>{{ e.timestamp|ts }}</td>
+<td>{{ e.class_name or '—' }}</td><td class="num">{{ e.score|num }}</td><td><span class="badge z-{{ e.zone or 'none' }}">{{ e.zone or e.status }}</span></td>
+<td>{{ 'sí' if e.image_ref else '—' }}</td></tr>{% endfor %}
+</table>
+<p><a href="/api/alerts/{{ a.alert_id }}">ver JSON</a></p>
+{% endblock %}
