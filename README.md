@@ -128,6 +128,10 @@ La definición, la adquisición, el cálculo, la trazabilidad y la verificación
 
 Requisitos: Python 3.11 o superior y unos 1.5 GB libres para torch CPU. Los comandos son para Windows; en Linux/macOS usa `.venv/bin/`.
 
+> **Windows:** torch instala archivos con rutas muy profundas. Si clonas en una carpeta con una ruta larga y no tienes
+> activado el soporte de rutas largas, `pip` falla con `OSError: [Errno 2] No such file or directory` dentro de
+> `torch-…dist-info`. Clona en una ruta corta, por ejemplo `C:\src\Monitoreo`, o activa *LongPathsEnabled*.
+
 ```bash
 git clone https://github.com/JGO-07/Monitoreo.git
 cd Monitoreo

@@ -1,0 +1,33 @@
+# Reproducción de C2 desde un clon limpio (venv nuevo, instalación según README), ruta %TEMP%\p6r\clon
+# Script: pasos de README § Instalación y § Uso. Fecha: 2026-11-13 (hora local)
+c516219 docs: README completo, inventario de extras e índice de evidencias
+13 passed, 1 warning in 17.80s
+run_id=run-c2_baja_confianza-20261114T034212 config_ref=mon-v1-f63818a0 model_ref=mobilenet_v3_large/IMAGENET1K_V2@sha256:5c1a416349c4 store=C:\Users\josue\AppData\Local\Temp\p6r\clon\var\repro
+Exportado run-c2_baja_confianza-20261114T034212 -> var/repro/export_c2 (18 m�tricas)
+Corrida run-c2_baja_confianza-20261114T034212  config mon-v1-f63818a0  commit c5162199dab9c05e6bdf1adfbb4f0fab1bbd30c0
+m�trica                                     reportado    recalculado  estado
+G1-tiempo-inferencia-p95                      30.4764        30.4764  OK
+G2-fps-captura                                 3.9999         3.9999  OK
+G3-cpu-proceso                                 53.475         53.475  OK
+G4-proporcion-baja-confianza                 0.641667       0.641667  OK
+G5-cobertura-trazabilidad                           1              1  OK
+G6-version-esperada-vs-reportada                    1              1  OK
+G7-alertas-activas                                  0              0  OK
+-- adicionales --
+G1-throughput                                 2.00097        2.00097  OK
+G1-tasa-errores                                     0              0  OK
+G2-frames-descartados                             0.5            0.5  OK
+G2-latencia-e2e-p95                           39.5643        39.5643  OK
+G3-ram-proceso                                360.289        360.289  OK
+G4-predicciones-por-clase                          49             49  OK
+G4-psi-confianza-vs-referencia                1.89118        1.89118  OK
+G5-imagenes-vinculadas                              1              1  OK
+G5-entradas-invalidas                               0              0  OK
+G6-tiempo-ultimo-reporte                     0.665864       0.665864  OK
+G7-tiempo-deteccion                           11.5631        11.5631  OK
+zonas [('accepted', 3), ('doubt', 40), ('low', 77)]
+ventanas [(0.7, 'breach'), (0.65, 'breach'), (0.35, 'normal'), (0.85, 'breach'), (0.85, 'breach'), (0.45, 'normal'), (None, 'insufficient')]
+alertas [('baja-confianza-v1', 'warning'), ('baja-confianza-v1', 'critical')]
+git ('c5162199dab9c05e6bdf1adfbb4f0fab1bbd30c0', 0)
+REPRO_OK
+exit=0

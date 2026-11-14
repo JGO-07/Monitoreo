@@ -59,7 +59,7 @@ Cada corrida guarda su propia revisión en `runs.git_commit`, visible en `/corri
 | **R6.1** C1 | Sección C1 abajo; `evidencias/escenarios/c1_normal/`; `portal/05`, `07`. |
 | **R6.2** C2 | Sección C2 abajo; `evidencias/escenarios/c2_baja_confianza/`; `portal/01`–`04`, `06`, `08`. |
 | **R7.1** Instalación y comandos | README § Instalación y § Uso. |
-| **R7.2** Evidencias verificables | Este índice; las exportaciones y `recalculo.txt`; los pasos de recálculo están abajo. |
+| **R7.2** Evidencias verificables | Este índice; las exportaciones y `recalculo.txt`; los pasos de recálculo están abajo; [`reproduccion/c2_clon_limpio.log`](reproduccion/c2_clon_limpio.log): C2 reproducido desde un clon limpio del commit `c516219` con venv nuevo, con resultados idénticos (77/40/3, mismas ventanas y alertas, 18/18 métricas OK). |
 | **R7.3** Autoría y procedencia | README § Autoría, aportación propia y componentes reutilizados. |
 | **Extras** | `docs/extras.md`. |
 
