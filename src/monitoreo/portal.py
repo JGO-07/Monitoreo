@@ -299,7 +299,11 @@ def _chart(windows: list[dict], run: dict, canon: dict, ctx: dict) -> dict | Non
     for i, w in enumerate(windows):
         rate = w["low_rate"]
         h = 0 if rate is None else rate * (H - 2 * pad)
+        insufficient = w["state"] == "insufficient"
+        if insufficient:  # sin evidencia suficiente: banda gris completa, no una barra "baja"
+            h = H - 2 * pad
         bars.append({"x": pad + i * bw + 2, "w": max(bw - 4, 1), "y": H - pad - h, "h": h, "state": w["state"],
+                     "insufficient": insufficient, "n": w["n_eligible"],
                      "label": f"{(w['window_start'] - run['started_at']):.0f}s",
                      "title": f"ventana {i}: n={w['n_eligible']} low={w['n_low']} "
                               f"rate={'—' if rate is None else f'{rate:.2f}'} estado={w['state']}"})

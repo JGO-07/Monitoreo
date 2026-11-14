@@ -40,6 +40,14 @@ acompaña a los p95 es de la misma familia y no se reclama.
 
 ## S · Escenarios adicionales
 
-Por ahora no se presentan escenarios adicionales. Los candidatos son la interrupción del stream con recuperación (regla
-`evidencia-insuficiente-v1`) y el cambio sostenido frente a la referencia (`cambio-sostenido-v1`). Si se agregan,
-se registrarán aquí con su evidencia.
+| ID | Descripción | Nivel solicitado | Complejidad acreditada | Evidencia | Doble conteo |
+| --- | --- | --- | --- | --- | --- |
+| S-01 | **Interrupción del stream con recuperación.** Es la secuencia de operación normal de C1 con inferencias reales y una pausa de 25 s de la fuente a partir del frame 80 (t = 20 s), declarada en [`escenarios/s01_interrupcion.yaml`](../escenarios/s01_interrupcion.yaml) (`gaps`), que simula una cámara que deja de entregar frames. | 10 | Secuencia compuesta con evidencia de cada etapa: **fallo** (evento de fuente `source_gap` a t = 20.0 s); **diagnóstico y reacción** (ventanas [20,30) y [30,40) con n = 0 en estado `insufficient`, no `normal`; `evidencia-insuficiente-v1` dispara una alerta `info` a t = 41.6 s con su acción sugerida); **recuperación** (la fuente vuelve a t = 45 s; la ventana [40,50) es suficiente con n = 10 y la alerta se resuelve a t = 51.6 s); **verificación posterior** (ventanas suficientes desde [50,60); el verificador comprueba 5/5 expectativas declaradas antes de la corrida; recálculo 18/18). Tiempo de detección (M-11 con la regla declarada) = 21.63 s; recuperación a 6.6 s del regreso de la fuente. | Corrida `run-s01_interrupcion-20261114T034828` (commit `84a9541`, árbol limpio); [`evidencias/escenarios/s01_interrupcion/`](../evidencias/escenarios/s01_interrupcion/) (`verificacion.txt`, `recalculo.txt`, `source_events.jsonl`, `window_evaluations.csv`, `alerts.json`); [`portal/11_corrida_s01_ventanas.jpg`](../evidencias/portal/11_corrida_s01_ventanas.jpg), [`portal/12_alerta_s01_evidencia_insuficiente.jpg`](../evidencias/portal/12_alerta_s01_evidencia_insuficiente.jpg). Para reproducir: `python -m monitoreo.cli run --scenario-file escenarios/s01_interrupcion.yaml --store <store>` y luego `python scripts/verificar_escenario.py --store <store> --run-id <run_id> --scenario-file escenarios/s01_interrupcion.yaml`. | Es distinto de C1/C2: prueba la ausencia de datos y no la baja confianza. No es la regla sostenida (R3.3) ni la de C2. |
+
+**Observación de S-01 (no reclamada como escenario):** al desplazar las ventanas, los mismos frames de C1 agrupados en
+[70,80) dieron low_rate = 0.60, igual al umbral, y dispararon `alert-s01_interrupcion-20261114T034828-002` (warning), que se resolvió
+en la ventana siguiente. Es un resultado real de la regla y se documenta como límite (README § Límites conocidos). Los
+umbrales no se modificaron.
+
+Pendiente, no presentado: un escenario de cambio sostenido frente a la referencia (`cambio-sostenido-v1` con 3 ventanas
+consecutivas), que requeriría una grabación degradada continua de al menos 40 s.

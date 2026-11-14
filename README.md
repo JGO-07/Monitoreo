@@ -12,7 +12,7 @@ recalcular cada resultado.
 | **Fuente** | Webcam de la computadora grabada como secuencia de imágenes y reproducida como stream a 4 fps; la webcam en vivo es opcional |
 | **Ejecución** | Local, CPU (Windows 11, Python 3.13, torch 2.15.0+cpu) |
 | **Índice de evidencias** | [`evidencias/indice.md`](evidencias/indice.md), que relaciona cada criterio con archivos, IDs y revisión Git |
-| **Extras reclamados** | [`docs/extras.md`](docs/extras.md) |
+| **Extras reclamados** | [`docs/extras.md`](docs/extras.md): 6 funcionalidades, 11 métricas y 1 escenario (S-01, interrupción del stream) |
 
 ## Arquitectura
 
@@ -194,6 +194,7 @@ código en el commit `3a0b5da` (árbol limpio).
 | C2 · baja confianza | `run-c2_baja_confianza-20261114T032255` | 120 | 77 / 40 / 3 | 0.70 · 0.65 · 0.35 · 0.85 · 0.85 · 0.45 | `…-001` warning (0.70) y `…-002` critical (0.85), ambas de `baja-confianza-v1` |
 
 El detalle, los comandos y las salidas están en `evidencias/escenarios/` y [`evidencias/indice.md`](evidencias/indice.md).
+Para comprobar las expectativas de un escenario: `python scripts/verificar_escenario.py --store <store> --run-id <run_id> --scenario-file escenarios/<escenario>.yaml`.
 
 ## Límites conocidos
 
@@ -202,6 +203,10 @@ El detalle, los comandos y las salidas están en `evidencias/escenarios/` y [`ev
 * La referencia y C1 se grabaron en la misma sesión y con la misma escena. La referencia no representa otras escenas ni horarios.
 * Las ventanas son temporales (reloj de pared). Al reproducir, el número de eventos por ventana puede variar en ±1 según la
   carga del equipo; los scores de cada frame son deterministas, porque la misma secuencia da los mismos scores.
+* **El margen de C1 frente a la alerta es estrecho.** C1 tuvo más transiciones entre objetos que la referencia y su peor
+  ventana fue 0.55. En S-01 los mismos frames, agrupados en otras ventanas por la pausa, llegaron a 0.60 en una ventana y
+  dispararon una alerta `warning` breve. Los umbrales se fijaron antes de las demostraciones y no se ajustaron después; un
+  siguiente paso sería ampliar la referencia con más sesiones de grabación.
 * El PSI con 120 observaciones es ruidoso: C1 da 0.38 frente a la referencia aunque no hay alerta. Solo describe la distribución de salidas.
 * CPU y latencias dependen del equipo; G3 se reporta en % de un núcleo del proceso.
 * La webcam en vivo no la puede reproducir el evaluador. Por eso las demostraciones usan grabaciones versionadas.

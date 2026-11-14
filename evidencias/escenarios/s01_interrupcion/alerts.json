@@ -1,0 +1,118 @@
+[
+  {
+    "alert_id": "alert-s01_interrupcion-20261114T034828-001",
+    "run_id": "run-s01_interrupcion-20261114T034828",
+    "rule_id": "evidencia-insuficiente-v1",
+    "timestamp": 1794628150.1380928,
+    "last_seen": 1794628150.1380956,
+    "resolved_at": 1794628160.1502538,
+    "status": "resolved",
+    "severity": "info",
+    "reason": "Evidencia insuficiente: 2 ventanas consecutivas con menos de 10 inferencias elegibles (n = 0, 0). No implica normalidad.",
+    "suggested_action": "Verificar que la fuente siga entregando frames (conexión, cámara, proceso). Sin observaciones suficientes no se puede afirmar operación normal.",
+    "config_ref": "mon-v1-f63818a0",
+    "window_start": 1794628128.5037704,
+    "window_end": 1794628148.5037704,
+    "query": "SELECT * FROM events WHERE run_id='run-s01_interrupcion-20261114T034828' AND timestamp >= 1794628128.5037704 AND timestamp < 1794628148.5037704 ORDER BY seq",
+    "evidence": {
+      "lower_threshold": 0.15,
+      "min_observations": 10,
+      "reference_ref": "ref-28147cbc",
+      "rule": {
+        "consecutive_windows": 2,
+        "rule_id": "evidencia-insuficiente-v1",
+        "severity": "info",
+        "suggested_action": "Verificar que la fuente siga entregando frames (conexión, cámara, proceso). Sin observaciones suficientes no se puede afirmar operación normal."
+      },
+      "rule_kind": "insufficient_data",
+      "upper_threshold": 0.4,
+      "window_size_s": 10.0,
+      "windows": [
+        {
+          "end": 1794628138.5037704,
+          "low_rate": null,
+          "mean_score": null,
+          "n": 0,
+          "n_low": 0,
+          "partial": false,
+          "start": 1794628128.5037704
+        },
+        {
+          "end": 1794628148.5037704,
+          "low_rate": null,
+          "mean_score": null,
+          "n": 0,
+          "n_low": 0,
+          "partial": false,
+          "start": 1794628138.5037704
+        }
+      ]
+    },
+    "event_ids": []
+  },
+  {
+    "alert_id": "alert-s01_interrupcion-20261114T034828-002",
+    "run_id": "run-s01_interrupcion-20261114T034828",
+    "rule_id": "baja-confianza-v1",
+    "timestamp": 1794628190.177189,
+    "last_seen": 1794628190.1771894,
+    "resolved_at": 1794628194.1572964,
+    "status": "resolved",
+    "severity": "warning",
+    "reason": "Proporción de baja confianza 12/20 = 0.60 >= 0.60 (score < 0.15) en 1 ventana(s) de 10 s con n >= 10.",
+    "suggested_action": "Revisar las capturas de baja confianza de la ventana: iluminación, oclusión, enfoque o encuadre de la cámara; confirmar que el preprocesamiento y el modelo son los esperados.",
+    "config_ref": "mon-v1-f63818a0",
+    "window_start": 1794628178.5037704,
+    "window_end": 1794628188.5037704,
+    "query": "SELECT * FROM events WHERE run_id='run-s01_interrupcion-20261114T034828' AND timestamp >= 1794628178.5037704 AND timestamp < 1794628188.5037704 ORDER BY seq",
+    "evidence": {
+      "lower_threshold": 0.15,
+      "min_observations": 10,
+      "reference_ref": "ref-28147cbc",
+      "rule": {
+        "consecutive_windows": 1,
+        "critical_low_rate": 0.85,
+        "min_low_rate": 0.6,
+        "rule_id": "baja-confianza-v1",
+        "severity": "warning",
+        "suggested_action": "Revisar las capturas de baja confianza de la ventana: iluminación, oclusión, enfoque o encuadre de la cámara; confirmar que el preprocesamiento y el modelo son los esperados."
+      },
+      "rule_kind": "low_confidence",
+      "upper_threshold": 0.4,
+      "window_size_s": 10.0,
+      "windows": [
+        {
+          "end": 1794628188.5037704,
+          "low_rate": 0.6,
+          "mean_score": 0.1473973,
+          "n": 20,
+          "n_low": 12,
+          "partial": false,
+          "start": 1794628178.5037704
+        }
+      ]
+    },
+    "event_ids": [
+      "evt-s01_interrupcion-20261114T034828-000180",
+      "evt-s01_interrupcion-20261114T034828-000182",
+      "evt-s01_interrupcion-20261114T034828-000184",
+      "evt-s01_interrupcion-20261114T034828-000186",
+      "evt-s01_interrupcion-20261114T034828-000188",
+      "evt-s01_interrupcion-20261114T034828-000190",
+      "evt-s01_interrupcion-20261114T034828-000192",
+      "evt-s01_interrupcion-20261114T034828-000194",
+      "evt-s01_interrupcion-20261114T034828-000196",
+      "evt-s01_interrupcion-20261114T034828-000198",
+      "evt-s01_interrupcion-20261114T034828-000200",
+      "evt-s01_interrupcion-20261114T034828-000202",
+      "evt-s01_interrupcion-20261114T034828-000204",
+      "evt-s01_interrupcion-20261114T034828-000206",
+      "evt-s01_interrupcion-20261114T034828-000208",
+      "evt-s01_interrupcion-20261114T034828-000210",
+      "evt-s01_interrupcion-20261114T034828-000212",
+      "evt-s01_interrupcion-20261114T034828-000214",
+      "evt-s01_interrupcion-20261114T034828-000216",
+      "evt-s01_interrupcion-20261114T034828-000218"
+    ]
+  }
+]

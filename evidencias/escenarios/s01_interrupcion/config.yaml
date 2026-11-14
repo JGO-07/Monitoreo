@@ -1,0 +1,73 @@
+# Configuración de monitoreo versionada.
+# config_ref = "<config_id>-<sha256 del contenido canónico, 8 hex>" y se guarda en cada evento y alerta.
+# La fuente visual se declara aparte (escenarios/*.yaml o CLI) para que C1 y C2 compartan
+# exactamente esta misma política: modelo, muestreo, umbrales, referencia, ventanas, reglas y captura.
+
+config_id: mon-v1
+
+model:
+  weights_file: models/mobilenet_v3_large-5c1a4163.pth
+  expected_model_ref: mobilenet_v3_large/IMAGENET1K_V2@sha256:5c1a416349c4
+  num_threads: 2
+
+sampling:
+  # Política: se infiere 1 de cada `infer_every_n` frames recibidos (los demás se descartan
+  # con motivo "sampling"). Si la cola de inferencia está llena, el frame se descarta con motivo
+  # "saturation". Los frames con error de lectura se registran con motivo "read_error".
+  infer_every_n: 2
+  queue_max: 8
+
+thresholds:
+  # Fijados con la corrida de referencia run-referencia-propuesta-20261114T030644 (ver docs/umbrales.md
+  # y evidencias/referencia/propuesta_umbrales.json) ANTES de ejecutar C1 y C2.
+  # Zonas: s < lower -> low ; lower <= s < upper -> doubt ; s >= upper -> accepted (no implica acierto).
+  lower: 0.15
+  upper: 0.40
+
+capture:
+  # Imágenes conservadas sin expiración automática en <store>/capturas/<run_id>/.
+  low_every_n: 1        # todas las de baja confianza
+  doubt_every_n: 3      # una de cada 3 dudosas (contador por zona)
+  accepted_every_n: 15  # muestra de operación normal
+  jpeg_quality: 90
+
+resources:
+  sample_interval_s: 1.0
+
+reference:
+  # Generado con `monitoreo.cli reference build` desde la corrida de referencia (misma config_ref,
+  # mismo modelo y preprocesamiento). Su hash (reference_ref) se guarda en cada corrida y alerta.
+  file: config/referencia.json
+
+windows:
+  # Ventanas temporales consecutivas (tumbling) sobre el instante de recepción del frame.
+  size_s: 10
+  min_observations: 10   # inferencias elegibles (status ok con score); menos => evidencia insuficiente
+  grace_s: 1.5           # espera tras el fin de la ventana para incluir eventos aún en proceso
+
+alerts:
+  low_confidence:
+    rule_id: baja-confianza-v1
+    min_low_rate: 0.60      # peor ventana de la referencia: 0.45 -> margen de 0.15
+    critical_low_rate: 0.85
+    consecutive_windows: 1
+    severity: warning
+    suggested_action: >-
+      Revisar las capturas de baja confianza de la ventana: iluminación, oclusión, enfoque o encuadre
+      de la cámara; confirmar que el preprocesamiento y el modelo son los esperados.
+  sustained_change:
+    rule_id: cambio-sostenido-v1
+    tolerance: 0.25
+    consecutive_windows: 3
+    severity: warning
+    suggested_action: >-
+      Posible cambio de condiciones respecto de la referencia. Comparar la distribución de confianza
+      y las capturas con la referencia; investigar cambios de escena, cámara o versión. La confianza
+      no confirma drift ni pérdida de calidad.
+  insufficient_data:
+    rule_id: evidencia-insuficiente-v1
+    consecutive_windows: 2
+    severity: info
+    suggested_action: >-
+      Verificar que la fuente siga entregando frames (conexión, cámara, proceso). Sin observaciones
+      suficientes no se puede afirmar operación normal.

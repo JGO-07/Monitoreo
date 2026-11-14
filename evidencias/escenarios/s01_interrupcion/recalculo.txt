@@ -1,0 +1,21 @@
+Corrida run-s01_interrupcion-20261114T034828  config mon-v1-f63818a0  commit 84a9541fff9b80bd0c9dc5bdb73b4d0ff4857dff
+métrica                                     reportado    recalculado  estado
+G1-tiempo-inferencia-p95                      32.1136        32.1136  OK
+G2-fps-captura                                2.81868        2.81868  OK
+G3-cpu-proceso                                38.0106        38.0106  OK
+G4-proporcion-baja-confianza                      0.4            0.4  OK
+G5-cobertura-trazabilidad                           1              1  OK
+G6-version-esperada-vs-reportada                    1              1  OK
+G7-alertas-activas                                  0              0  OK
+-- adicionales --
+G1-throughput                                 1.40809        1.40809  OK
+G1-tasa-errores                                     0              0  OK
+G2-frames-descartados                             0.5            0.5  OK
+G2-latencia-e2e-p95                            40.336         40.336  OK
+G3-ram-proceso                                359.102        359.102  OK
+G4-predicciones-por-clase                          24             24  OK
+G4-psi-confianza-vs-referencia                0.37946        0.37946  OK
+G5-imagenes-vinculadas                              1              1  OK
+G5-entradas-invalidas                               0              0  OK
+G6-tiempo-ultimo-reporte                      1.07065        1.07065  OK
+G7-tiempo-deteccion                           21.6343        21.6343  OK

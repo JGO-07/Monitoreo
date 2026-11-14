@@ -9,6 +9,7 @@
 | `6eb658c` | Código y configuración con los umbrales finales; ejecutó la corrida de referencia final `run-referencia-20261114T031049`. |
 | `3a0b5da` | **Código ejecutado en C1 y C2** (árbol limpio en `src/`, `config/` y `models/`; `runs.git_dirty = 0`). Contiene el portal, las métricas y el manifiesto de C2 con `condition.onset_s`. |
 | `6d58b44` | Evidencias de C1/C2 agregadas **después** de la ejecución: store, exportaciones, recálculo y capturas del portal. No cambia el código ejecutado. |
+| `84a9541` | Código que ejecutó S-01 (manifiesto con `gaps` y verificador de expectativas). |
 | Commit que agrega este índice | Documentación (README, `docs/extras.md`), recálculo de métricas adicionales, demostración en vivo (F-01) y corrección de `metrics.py`: la corrida de referencia ya no toma como referencia el archivo actual, solo la registrada por la corrida. No modifica los resultados de C1/C2 (`recalculo.txt` 18/18 OK). |
 
 Cada corrida guarda su propia revisión en `runs.git_commit`, visible en `/corridas/<run_id>` y en `run.json`.
@@ -17,9 +18,9 @@ Cada corrida guarda su propia revisión en `runs.git_commit`, visible en `/corri
 
 | Ruta | Contenido |
 | --- | --- |
-| `evidencias/almacen/monitoreo.db` | Store SQLite con las corridas evaluadas: `referencia-propuesta`, `referencia`, `c1_normal` y `c2_baja_confianza`. |
+| `evidencias/almacen/monitoreo.db` | Store SQLite con las corridas evaluadas: `referencia-propuesta`, `referencia`, `c1_normal`, `c2_baja_confianza` y `s01_interrupcion` (extra). |
 | `evidencias/almacen/capturas/<run_id>/` | Capturas vinculadas por `image_ref` y `image_sha256`; sin expiración. |
-| `evidencias/escenarios/<escenario>/` | Exportación por corrida: `run.json`, `config.yaml`, `frames.csv`, `events.jsonl`, `window_evaluations.csv`, `resource_samples.csv`, `source_events.jsonl`, `alerts.json`, `metricas.json` y `recalculo.txt`. |
+| `evidencias/escenarios/<escenario>/` | Exportación por corrida: `run.json`, `config.yaml`, `frames.csv`, `events.jsonl`, `window_evaluations.csv`, `resource_samples.csv`, `source_events.jsonl`, `alerts.json`, `metricas.json`, `recalculo.txt` y `verificacion.txt` (expectativas del manifiesto verificadas con `scripts/verificar_escenario.py`: C1 2/2, C2 1/1, S-01 5/5). |
 | `evidencias/referencia/propuesta_umbrales.json` | Análisis de referencia usado para fijar los umbrales. |
 | `evidencias/modelo/` | Manifiesto del modelo y primeras inferencias. |
 | `evidencias/metricas/inventario.json` | Definiciones de todas las métricas (exportadas de `REGISTRY`). |
@@ -38,6 +39,7 @@ Cada corrida guarda su propia revisión en `runs.git_commit`, visible en `/corri
 | Fuente | `webcam-escritorio-01` |
 | C1 | `run-c1_normal-20261114T032144` |
 | C2 | `run-c2_baja_confianza-20261114T032255`; alertas `alert-c2_baja_confianza-20261114T032255-001` (warning) y `-002` (critical) |
+| S-01 (extra) | `run-s01_interrupcion-20261114T034828` (commit `84a9541`); alerta `alert-s01_interrupcion-20261114T034828-001` (info) |
 
 ## Criterios → evidencia
 
@@ -61,7 +63,7 @@ Cada corrida guarda su propia revisión en `runs.git_commit`, visible en `/corri
 | **R7.1** Instalación y comandos | README § Instalación y § Uso. |
 | **R7.2** Evidencias verificables | Este índice; las exportaciones y `recalculo.txt`; los pasos de recálculo están abajo; [`reproduccion/c2_clon_limpio.log`](reproduccion/c2_clon_limpio.log): C2 reproducido desde un clon limpio del commit `c516219` con venv nuevo, con resultados idénticos (77/40/3, mismas ventanas y alertas, 18/18 métricas OK). |
 | **R7.3** Autoría y procedencia | README § Autoría, aportación propia y componentes reutilizados. |
-| **Extras** | `docs/extras.md`. |
+| **Extras** | `docs/extras.md` (F-01..F-06, M-01..M-11, S-01). |
 
 ## C1 · Operación normal
 

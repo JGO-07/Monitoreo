@@ -1,0 +1,7 @@
+Escenario s01_interrupcion · corrida run-s01_interrupcion-20261114T034828 · commit 84a9541fff9b80bd0c9dc5bdb73b4d0ff4857dff (git_dirty=0) · config mon-v1-f63818a0
+[OK] alerta presente: evidencia-insuficiente-v1 — alert-s01_interrupcion-20261114T034828-001 (info, t=41.6s)
+[OK] alerta resuelta: evidencia-insuficiente-v1 — resuelta t=51.6s
+[OK] evento de fuente: source_gap — source_closed, source_gap, source_opened
+[OK] ventanas insuficientes durante la condición: baja-confianza-v1 — [20,30)s n=0 insufficient; [30,40)s n=0 insufficient
+[OK] ventana suficiente tras la recuperación: baja-confianza-v1 — primera: [50,60)s n=20 normal
+5/5 expectativas cumplidas

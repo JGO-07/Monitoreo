@@ -115,7 +115,9 @@ def main() -> int:
     calc["G5-entradas-invalidas"] = sum(f["outcome"] == "read_error" for f in frames) / len(frames) if frames else None
     calc["G6-tiempo-ultimo-reporte"] = (end - max(e["timestamp"] for e in events)) if events and end else None
     onset = (json.loads((d / "metricas.json").read_text(encoding="utf-8"))["context"].get("condition_onset_s"))
-    first = sorted((x for x in alerts if x["rule_id"] == "baja-confianza-v1"), key=lambda x: x["timestamp"])
+    ctx = json.loads((d / "metricas.json").read_text(encoding="utf-8"))["context"]
+    cond_rule = ctx.get("condition_rule", "baja-confianza-v1")
+    first = sorted((x for x in alerts if x["rule_id"] == cond_rule), key=lambda x: x["timestamp"])
     calc["G7-tiempo-deteccion"] = (first[0]["timestamp"] - (run["started_at"] + onset)
                                    if onset is not None and first else None)
 

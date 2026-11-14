@@ -1,0 +1,4 @@
+Escenario c1_normal · corrida run-c1_normal-20261114T032144 · commit 3a0b5da8b820b70852d1d4a1408a2c15b5c713f1 (git_dirty=0) · config mon-v1-f63818a0
+[OK] alerta ausente: baja-confianza-v1 — 0 alerta(s)
+[OK] alerta ausente: cambio-sostenido-v1 — 0 alerta(s)
+2/2 expectativas cumplidas
