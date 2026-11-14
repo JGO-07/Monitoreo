@@ -382,10 +382,9 @@ def context_for(store: Store, run_id: str, cfg=None, scenario_spec: dict | None 
     src = json.loads(run["source_json"])
     canon = json.loads(store.one("SELECT canonical_json FROM configs WHERE config_ref=?", (run["config_ref"],))
                        ["canonical_json"])
+    # Solo la referencia registrada por la corrida al iniciar (trazable por reference_ref);
+    # la propia corrida de referencia no tiene referencia previa.
     ref = json.loads(run["reference_json"]) if run["reference_json"] else None
-    if ref is None and cfg is not None:
-        from .rules import load_reference
-        ref, _ = load_reference(cfg)
     ctx = {"declared_fps": src.get("fps"), "expected_model_ref": canon["model"]["expected_model_ref"],
            "reference": ref}
     if scenario_spec and scenario_spec.get("condition"):

@@ -1,4 +1,4 @@
-"""Recalcula las métricas base (G1–G7) desde la exportación de una corrida, sin usar el paquete.
+"""Recalcula las métricas base (G1–G7) y las adicionales desde la exportación de una corrida, sin usar el paquete.
 
 Solo biblioteca estándar. Lee frames.csv, events.jsonl, resource_samples.csv, alerts.json y
 run.json de la carpeta exportada y compara con metricas.json.
@@ -6,7 +6,7 @@ run.json de la carpeta exportada y compara con metricas.json.
 Uso:
     python scripts/recalcular_metricas.py evidencias/escenarios/c1_normal --store evidencias/almacen
 
-Sale con código 1 si alguna métrica base difiere en más de 1e-9 (relativo).
+Sale con código 1 si alguna métrica difiere en más de 1e-9 (relativo).
 """
 
 from __future__ import annotations
@@ -85,10 +85,46 @@ def main() -> int:
     end = run["ended_at"]
     calc["G7-alertas-activas"] = sum(1 for x in alerts if x["resolved_at"] is None or x["resolved_at"] > end)
 
+    # ---------------- métricas adicionales ----------------
+    done = sorted(e["done_at"] for e in ok)
+    calc["G1-throughput"] = (len(done) - 1) / (done[-1] - done[0]) if len(done) > 1 else None
+    calc["G1-tasa-errores"] = sum(e["status"] == "error" for e in events) / len(events) if events else None
+    calc["G2-frames-descartados"] = (sum(f["outcome"] in ("dropped_sampling", "dropped_saturation") for f in frames)
+                                     / len(frames)) if frames else None
+    calc["G2-latencia-e2e-p95"] = pct([e["e2e_ms"] for e in ok], 0.95)
+    rss = [num(r["process_rss_mb"]) for r in res if num(r["process_rss_mb"]) is not None]
+    calc["G3-ram-proceso"] = max(rss) if rss else None
+    calc["G4-predicciones-por-clase"] = len({e["class_name"] for e in ok}) if ok else None
+    ref = run.get("reference")
+    if ref and scored:
+        cur = [0] * 10
+        for e in scored:
+            cur[min(int(e["score"] * 10), 9)] += 1
+        rc = ref["histogram"]["counts"]
+        psi = 0.0
+        for i in range(10):
+            pr, pc = max(rc[i] / sum(rc), 1e-4), max(cur[i] / len(scored), 1e-4)
+            psi += (pc - pr) * math.log(pc / pr)
+        calc["G4-psi-confianza-vs-referencia"] = psi
+    else:
+        calc["G4-psi-confianza-vs-referencia"] = None
+    claimed = [e for e in events if e["image_ref"]]
+    valid = sum(1 for e in claimed if (store / e["image_ref"]).exists()
+                and hashlib.sha256((store / e["image_ref"]).read_bytes()).hexdigest() == e["image_sha256"])
+    calc["G5-imagenes-vinculadas"] = valid / len(claimed) if claimed else None
+    calc["G5-entradas-invalidas"] = sum(f["outcome"] == "read_error" for f in frames) / len(frames) if frames else None
+    calc["G6-tiempo-ultimo-reporte"] = (end - max(e["timestamp"] for e in events)) if events and end else None
+    onset = (json.loads((d / "metricas.json").read_text(encoding="utf-8"))["context"].get("condition_onset_s"))
+    first = sorted((x for x in alerts if x["rule_id"] == "baja-confianza-v1"), key=lambda x: x["timestamp"])
+    calc["G7-tiempo-deteccion"] = (first[0]["timestamp"] - (run["started_at"] + onset)
+                                   if onset is not None and first else None)
+
     bad = 0
     print(f"Corrida {run['run_id']}  config {run['config_ref']}  commit {run['git_commit']}")
     print(f"{'métrica':38s} {'reportado':>14s} {'recalculado':>14s}  estado")
     for k, v in calc.items():
+        if k == "G1-throughput":
+            print("-- adicionales --")
         r = reported[k]["value"]
         same = (r is None and v is None) or (r is not None and v is not None and
                                              math.isclose(r, v, rel_tol=1e-9, abs_tol=1e-12))

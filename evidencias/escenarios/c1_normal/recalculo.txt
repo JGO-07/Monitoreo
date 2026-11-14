@@ -7,3 +7,15 @@ G4-proporcion-baja-confianza                      0.4            0.4  OK
 G5-cobertura-trazabilidad                           1              1  OK
 G6-version-esperada-vs-reportada                    1              1  OK
 G7-alertas-activas                                  0              0  OK
+-- adicionales --
+G1-throughput                                 2.00101        2.00101  OK
+G1-tasa-errores                                     0              0  OK
+G2-frames-descartados                             0.5            0.5  OK
+G2-latencia-e2e-p95                           41.5416        41.5416  OK
+G3-ram-proceso                                359.207        359.207  OK
+G4-predicciones-por-clase                          24             24  OK
+G4-psi-confianza-vs-referencia                0.37946        0.37946  OK
+G5-imagenes-vinculadas                              1              1  OK
+G5-entradas-invalidas                               0              0  OK
+G6-tiempo-ultimo-reporte                     0.676234       0.676234  OK
+G7-tiempo-deteccion                              null           null  OK

@@ -145,7 +145,7 @@
         "doubt": 49,
         "accepted": 38
       },
-      "reference_low_rate": 0.275,
+      "reference_low_rate": null,
       "query": "SELECT event_id, score, zone FROM events WHERE run_id=? AND status='ok' AND score IS NOT NULL",
       "evidence_ids": [
         "evt-referencia-20261114T031049-000000",
@@ -248,64 +248,10 @@
       "base": false,
       "name": "PSI de la distribución de confianza vs referencia",
       "unit": "PSI",
-      "value": 0.0,
+      "value": null,
       "n": 120,
-      "reference_n": 120,
-      "bins": [
-        {
-          "bin": "[0.0,0.1)",
-          "ref": 0.18333333333333332,
-          "run": 0.18333333333333332
-        },
-        {
-          "bin": "[0.1,0.2)",
-          "ref": 0.175,
-          "run": 0.175
-        },
-        {
-          "bin": "[0.2,0.3)",
-          "ref": 0.125,
-          "run": 0.125
-        },
-        {
-          "bin": "[0.3,0.4)",
-          "ref": 0.2,
-          "run": 0.2
-        },
-        {
-          "bin": "[0.4,0.5)",
-          "ref": 0.16666666666666666,
-          "run": 0.16666666666666666
-        },
-        {
-          "bin": "[0.5,0.6)",
-          "ref": 0.11666666666666667,
-          "run": 0.11666666666666667
-        },
-        {
-          "bin": "[0.6,0.7)",
-          "ref": 0.016666666666666666,
-          "run": 0.016666666666666666
-        },
-        {
-          "bin": "[0.7,0.8)",
-          "ref": 0.016666666666666666,
-          "run": 0.016666666666666666
-        },
-        {
-          "bin": "[0.8,0.9)",
-          "ref": 0.0,
-          "run": 0.0
-        },
-        {
-          "bin": "[0.9,1.0)",
-          "ref": 0.0,
-          "run": 0.0
-        }
-      ],
       "query": "SELECT score FROM events WHERE run_id=? AND status='ok' AND score IS NOT NULL",
-      "status": "ok",
-      "interpretation": "PSI < 0.1 estable; 0.1–0.25 cambio moderado; > 0.25 cambio importante (convención usual; describe la distribución de salidas, no calidad)."
+      "status": "sin_referencia"
     },
     "G5-cobertura-trazabilidad": {
       "group": "G5",

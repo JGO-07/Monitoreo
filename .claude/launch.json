@@ -4,8 +4,35 @@
     {
       "name": "portal",
       "runtimeExecutable": ".venv/Scripts/python.exe",
-      "runtimeArgs": ["-m", "monitoreo.cli", "serve", "--store", "evidencias/almacen", "--port", "8765"],
+      "runtimeArgs": [
+        "-m",
+        "monitoreo.cli",
+        "serve",
+        "--store",
+        "evidencias/almacen",
+        "--port",
+        "8765"
+      ],
       "port": 8765
+    },
+    {
+      "name": "portal-live",
+      "runtimeExecutable": ".venv/Scripts/python.exe",
+      "runtimeArgs": [
+        "-m",
+        "monitoreo.cli",
+        "serve",
+        "--live",
+        "--scenario-file",
+        "escenarios/c1_normal.yaml",
+        "--scenario",
+        "en_vivo_demo",
+        "--store",
+        "evidencias/extras/en_vivo",
+        "--port",
+        "8766"
+      ],
+      "port": 8766
     }
   ]
 }
