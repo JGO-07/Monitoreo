@@ -1,9 +1,9 @@
 """Referencia de confianza construida desde una corrida real en condiciones representativas.
 
-``propose``: calcula cuantiles de los scores top-1 de la corrida y propone umbrales con la
-regla documentada (inferior = p10 redondeado hacia abajo a 0.05; superior = p50 redondeado
-hacia abajo a 0.05). Los scores no dependen de los umbrales, así que la propuesta puede hacerse
-con umbrales provisionales; después la referencia se vuelve a grabar con la configuración final.
+``propose``: analiza los scores top-1 de una corrida de referencia (cuantiles, por clase y por
+ventana) y evalúa pares de umbrales candidatos. Los scores no dependen de los umbrales, así que
+el análisis puede hacerse con umbrales provisionales; la decisión se documenta en
+``docs/umbrales.md`` y la referencia se vuelve a grabar con la configuración final.
 
 ``build``: escribe ``config/referencia.json`` desde una corrida ejecutada con la configuración
 final (misma ``config_ref``); falla si la corrida usó otra configuración o modelo.
@@ -12,7 +12,6 @@ final (misma ``config_ref``); falla si la corrida usó otra configuración o mod
 from __future__ import annotations
 
 import json
-import math
 from collections import Counter
 
 import numpy as np
@@ -31,22 +30,37 @@ def _scores(store: Store, run_id: str) -> tuple[list[dict], np.ndarray]:
     return evs, np.array([e["score"] for e in evs], dtype=float)
 
 
-def _floor05(x: float) -> float:
-    return math.floor(x * 20 + 1e-9) / 20
+CANDIDATES = ((0.10, 0.40), (0.15, 0.40), (0.15, 0.45), (0.20, 0.40), (0.20, 0.45), (0.25, 0.45), (0.25, 0.50))
 
 
-def propose(store: Store, run_id: str) -> dict:
+def propose(store: Store, run_id: str, window_s: float = 10.0, min_obs: int = 10) -> dict:
+    """Análisis de la referencia para elegir umbrales (no decide: documenta la evidencia).
+
+    Para cada par candidato calcula la proporción de zonas en la referencia y la proporción de
+    baja confianza por ventana (mismas ventanas que el motor de reglas), para comprobar que la
+    regla de alerta no se dispara en condiciones normales.
+    """
     evs, s = _scores(store, run_id)
-    q = {f"p{int(p * 100):02d}": float(np.quantile(s, p)) for p in QUANTILES}
-    lower, upper = _floor05(q["p10"]), _floor05(q["p50"])
-    if not lower < upper:
-        upper = min(1.0, lower + 0.05)
+    run = store.one("SELECT started_at FROM runs WHERE run_id=?", (run_id,))
+    k = np.floor((np.array([e["timestamp"] for e in evs]) - run["started_at"]) / window_s).astype(int)
+    by_class: dict[str, list[float]] = {}
+    for e in evs:
+        by_class.setdefault(e["class_name"], []).append(e["score"])
+    cands = []
+    for lo, up in CANDIDATES:
+        wr = [float((s[k == i] < lo).mean()) for i in range(int(k.max()) + 1) if (k == i).sum() >= min_obs]
+        cands.append({"lower": lo, "upper": up, "low_rate": float((s < lo).mean()),
+                      "doubt_rate": float(((s >= lo) & (s < up)).mean()), "accepted_rate": float((s >= up).mean()),
+                      "window_low_rates": [round(x, 4) for x in wr], "max_window_low_rate": max(wr) if wr else None})
     return {
-        "run_id": run_id, "n": len(s), "quantiles": q, "mean": float(s.mean()),
-        "proposed": {"lower": lower, "upper": upper},
-        "rule": "lower = floor_0.05(p10), upper = floor_0.05(p50) de los scores top-1 de la referencia",
-        "expected_reference_low_rate": float((s < lower).mean()),
-        "expected_reference_accepted_rate": float((s >= upper).mean()),
+        "run_id": run_id, "n": len(s), "mean": float(s.mean()),
+        "quantiles": {f"p{int(p * 100):02d}": float(np.quantile(s, p)) for p in QUANTILES},
+        "window_s": window_s, "events_per_window": np.bincount(k).tolist(),
+        "by_class": sorted(({"class_name": c, "n": len(v), "mean": float(np.mean(v)), "min": float(min(v)),
+                             "max": float(max(v))} for c, v in by_class.items()), key=lambda d: -d["n"]),
+        "candidates": cands,
+        "scores_by_seq": [{"seq": e["seq"], "event_id": e["event_id"], "class_name": e["class_name"],
+                           "score": e["score"]} for e in evs],
     }
 
 

@@ -18,10 +18,11 @@ sampling:
   queue_max: 8
 
 thresholds:
-  # PROVISIONAL hasta registrar la corrida de referencia (hito 3).
-  # Zonas: s < lower -> low ; lower <= s < upper -> doubt ; s >= upper -> accepted.
-  lower: 0.30
-  upper: 0.60
+  # Fijados con la corrida de referencia run-referencia-propuesta-20261114T030644 (ver docs/umbrales.md
+  # y evidencias/referencia/propuesta_umbrales.json) ANTES de ejecutar C1 y C2.
+  # Zonas: s < lower -> low ; lower <= s < upper -> doubt ; s >= upper -> accepted (no implica acierto).
+  lower: 0.15
+  upper: 0.40
 
 capture:
   # Imágenes conservadas sin expiración automática en <store>/capturas/<run_id>/.
@@ -47,8 +48,8 @@ windows:
 alerts:
   low_confidence:
     rule_id: baja-confianza-v1
-    min_low_rate: 0.50
-    critical_low_rate: 0.80
+    min_low_rate: 0.60      # peor ventana de la referencia: 0.45 -> margen de 0.15
+    critical_low_rate: 0.85
     consecutive_windows: 1
     severity: warning
     suggested_action: >-

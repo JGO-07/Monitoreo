@@ -9,3 +9,5 @@ runs/
 *.db-journal
 .env
 var/
+*.db-wal
+*.db-shm

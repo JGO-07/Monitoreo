@@ -7,6 +7,7 @@ o versionarse sin romper vínculos. No existe ninguna rutina de expiración ni b
 
 from __future__ import annotations
 
+import atexit
 import json
 import sqlite3
 import threading
@@ -145,6 +146,8 @@ class Store:
         self.conn.execute("PRAGMA journal_mode=WAL")
         self.conn.executescript(SCHEMA)
         self.conn.commit()
+        self._closed = False
+        atexit.register(self.close)
 
     # ---- escritura -------------------------------------------------------------
     def insert(self, table: str, row: dict) -> None:
@@ -179,8 +182,13 @@ class Store:
         return self.root / image_ref
 
     def close(self) -> None:
+        """Consolida el WAL en monitoreo.db para que el archivo versionado sea autosuficiente."""
         with self.lock:
+            if self._closed:
+                return
+            self.conn.execute("PRAGMA wal_checkpoint(TRUNCATE)")
             self.conn.close()
+            self._closed = True
 
 
 def dumps(obj) -> str:
