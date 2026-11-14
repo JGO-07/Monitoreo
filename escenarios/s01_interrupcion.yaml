@@ -1,0 +1,28 @@
+scenario: s01_interrupcion
+description: >-
+  S-01 · Interrupción del stream con recuperación. Misma secuencia de operación normal de C1
+  (inferencias reales) con una pausa de 25 s de la fuente a partir del frame 80 (t ≈ 20 s), que
+  simula una cámara que deja de entregar frames. Esperado: durante la interrupción las ventanas
+  quedan en evidencia insuficiente (no en normalidad); evidencia-insuficiente-v1 se dispara tras
+  2 ventanas completas sin observaciones suficientes; la regla de baja confianza registra esas
+  ventanas como insuficientes (no como normales); al reanudarse el stream vuelven ventanas suficientes y la alerta
+  se resuelve.
+source:
+  source_id: webcam-escritorio-01
+  kind: sequence
+  path: data/escenarios/c1_normal
+  fps: 4
+gaps:
+  - at_seq: 80
+    seconds: 25
+condition:
+  # Inicio conocido de la condición: el frame 80 se entrega a t = 80/4 = 20 s; la pausa empieza ahí.
+  onset_s: 20
+  rule_id: evidencia-insuficiente-v1
+  recovery_s: 45      # 20 s + 25 s de pausa: la fuente vuelve a entregar frames
+expected:
+  source_events_present: [source_gap]
+  alerts_present: [evidencia-insuficiente-v1]
+  alerts_resolved: [evidencia-insuficiente-v1]
+  windows_insufficient_during_condition: [baja-confianza-v1]
+  sufficient_window_after_recovery: [baja-confianza-v1]
