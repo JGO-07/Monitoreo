@@ -10,3 +10,8 @@ source:
   fps: 4
 expected:
   alerts_present: [baja-confianza-v1]
+condition:
+  # La secuencia completa se grabó degradada (poca luz, oclusión, desenfoque): la condición
+  # empieza en t = 0 s respecto del inicio de la corrida. Se usa para G7-tiempo-deteccion.
+  onset_s: 0
+  rule_id: baja-confianza-v1
