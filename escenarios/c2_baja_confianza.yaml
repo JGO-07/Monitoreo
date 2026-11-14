@@ -1,0 +1,12 @@
+scenario: c2_baja_confianza
+description: >-
+  C2 · Baja confianza. Misma escena con iluminación baja, oclusión y desenfoque. Las puntuaciones
+  provienen de inferencia real; no se modifican. Esperado: zona low dominante, capturas de baja
+  confianza conservadas y alerta baja-confianza-v1 al cumplirse su condición.
+source:
+  source_id: webcam-escritorio-01
+  kind: sequence
+  path: data/escenarios/c2_baja_confianza
+  fps: 4
+expected:
+  alerts_present: [baja-confianza-v1]

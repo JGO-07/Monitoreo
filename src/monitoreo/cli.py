@@ -137,6 +137,45 @@ def cmd_record(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_probe(args: argparse.Namespace) -> int:
+    """Inferencia en vivo de la webcam, solo en consola (no guarda nada). Sirve para encuadrar."""
+    from .config import SourceCfg
+    from .model import Classifier
+    from .sources import open_source
+
+    clf = Classifier()
+    src = SourceCfg(source_id="probe", kind="webcam", device=args.device, fps=args.fps, duration_s=args.seconds)
+    try:
+        for raw in open_source(src):
+            if raw.image is None:
+                print("fallo de lectura")
+                continue
+            p = clf.predict(raw.image)
+            alt = ", ".join(f"{t['class_name']} {t['score']:.2f}" for t in p.top5[1:3])
+            print(f"{raw.seq:4d}  {p.class_name:28s} {p.score:.3f}   ({alt})", flush=True)
+    except KeyboardInterrupt:
+        pass
+    return 0
+
+
+def cmd_reference(args: argparse.Namespace) -> int:
+    from . import reference
+    from .config import load_config, resolve
+    from .store import Store
+
+    store = Store(resolve(args.store))
+    run_id = args.run_id or store.one(
+        "SELECT run_id FROM runs WHERE scenario='referencia' ORDER BY started_at DESC LIMIT 1")["run_id"]
+    if args.action == "propose":
+        out = reference.propose(store, run_id)
+    else:
+        cfg = load_config(args.config)
+        out = reference.build(store, run_id, cfg)
+        out["written_to"] = reference.write(out, cfg)
+    print(json.dumps(out, indent=2, ensure_ascii=False))
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="monitoreo")
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -174,6 +213,19 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--seconds", type=float, default=60.0)
     s.add_argument("--prefix", default="frame_")
     s.set_defaults(func=cmd_record)
+
+    s = sub.add_parser("probe", help="Muestra clase y score en vivo desde la webcam (no guarda)")
+    s.add_argument("--device", type=int, default=0)
+    s.add_argument("--fps", type=float, default=2.0)
+    s.add_argument("--seconds", type=float, default=30.0)
+    s.set_defaults(func=cmd_probe)
+
+    s = sub.add_parser("reference", help="Propone umbrales o construye la referencia desde una corrida")
+    s.add_argument("action", choices=["propose", "build"])
+    s.add_argument("--store", default="var/store")
+    s.add_argument("--run-id", help="Por defecto, la última corrida con escenario 'referencia'")
+    s.add_argument("--config", default="config/monitoreo.yaml")
+    s.set_defaults(func=cmd_reference)
     return p
 
 

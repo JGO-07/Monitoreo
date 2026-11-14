@@ -1,0 +1,12 @@
+scenario: c1_normal
+description: >-
+  C1 · Operación normal. Grabación distinta de la referencia, misma escena y condiciones normales.
+  Esperado: inferencias reales mayoritariamente en zonas accepted/doubt, sin alerta de baja confianza
+  ni de cambio sostenido (las reglas se evalúan; no se fabrican estados).
+source:
+  source_id: webcam-escritorio-01
+  kind: sequence
+  path: data/escenarios/c1_normal
+  fps: 4
+expected:
+  alerts_absent: [baja-confianza-v1, cambio-sostenido-v1]

@@ -31,6 +31,8 @@ CREATE TABLE IF NOT EXISTS runs (
   model_json TEXT NOT NULL,
   source_id TEXT NOT NULL,
   source_json TEXT NOT NULL,
+  reference_ref TEXT,          -- hash del archivo de referencia vigente al iniciar
+  reference_json TEXT,
   git_commit TEXT,
   git_dirty INTEGER,
   status TEXT NOT NULL DEFAULT 'running',

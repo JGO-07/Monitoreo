@@ -1,0 +1,9 @@
+scenario: referencia
+description: >-
+  Corrida de referencia en condiciones representativas (buena iluminación, escena sin oclusión).
+  Sus scores fijan los umbrales y la referencia del cambio sostenido.
+source:
+  source_id: webcam-escritorio-01
+  kind: sequence
+  path: data/escenarios/referencia
+  fps: 4

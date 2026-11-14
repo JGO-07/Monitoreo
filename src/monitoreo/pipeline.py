@@ -71,8 +71,12 @@ class Pipeline:
             "created_at": time.time(), "canonical_json": dumps(cfg.canonical()), "raw_yaml": cfg.raw_text,
         })
         commit, dirty = git_state()
+        from .rules import load_reference
+        ref, ref_ref = load_reference(cfg)
+        self.started_at = time.time()
         self.store.insert("runs", {
-            "run_id": self.run_id, "scenario": self.scenario, "started_at": time.time(),
+            "run_id": self.run_id, "scenario": self.scenario, "started_at": self.started_at,
+            "reference_ref": ref_ref, "reference_json": dumps(ref) if ref else None,
             "config_ref": cfg.config_ref, "model_ref": self.clf.model_ref, "model_json": dumps(self.clf.identity()),
             "source_id": self.source.source_id, "source_json": dumps(self.source.model_dump()),
             "git_commit": commit, "git_dirty": None if dirty is None else int(dirty), "notes": self.notes,
@@ -80,6 +84,8 @@ class Pipeline:
 
     def start(self) -> None:
         self._register()
+        if self.rules:
+            self.rules.begin(self.started_at)
         targets = [self._produce, self._consume, self._sample_resources]
         if self.rules:
             targets.append(self._tick_rules)

@@ -32,3 +32,41 @@ capture:
 
 resources:
   sample_interval_s: 1.0
+
+reference:
+  # Generado con `monitoreo.cli reference build` desde la corrida de referencia (misma config_ref,
+  # mismo modelo y preprocesamiento). Su hash (reference_ref) se guarda en cada corrida y alerta.
+  file: config/referencia.json
+
+windows:
+  # Ventanas temporales consecutivas (tumbling) sobre el instante de recepción del frame.
+  size_s: 10
+  min_observations: 10   # inferencias elegibles (status ok con score); menos => evidencia insuficiente
+  grace_s: 1.5           # espera tras el fin de la ventana para incluir eventos aún en proceso
+
+alerts:
+  low_confidence:
+    rule_id: baja-confianza-v1
+    min_low_rate: 0.50
+    critical_low_rate: 0.80
+    consecutive_windows: 1
+    severity: warning
+    suggested_action: >-
+      Revisar las capturas de baja confianza de la ventana: iluminación, oclusión, enfoque o encuadre
+      de la cámara; confirmar que el preprocesamiento y el modelo son los esperados.
+  sustained_change:
+    rule_id: cambio-sostenido-v1
+    tolerance: 0.25
+    consecutive_windows: 3
+    severity: warning
+    suggested_action: >-
+      Posible cambio de condiciones respecto de la referencia. Comparar la distribución de confianza
+      y las capturas con la referencia; investigar cambios de escena, cámara o versión. La confianza
+      no confirma drift ni pérdida de calidad.
+  insufficient_data:
+    rule_id: evidencia-insuficiente-v1
+    consecutive_windows: 2
+    severity: info
+    suggested_action: >-
+      Verificar que la fuente siga entregando frames (conexión, cámara, proceso). Sin observaciones
+      suficientes no se puede afirmar operación normal.
