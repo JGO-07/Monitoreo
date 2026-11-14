@@ -1,0 +1,2 @@
+{"id": 9, "run_id": "run-c2_baja_confianza-20261114T032255", "timestamp": 1794626576.0799255, "kind": "source_opened", "detail_json": "{\"files\": 240, \"fps\": 4.0, \"kind\": \"sequence\", \"path\": \"data/escenarios/c2_baja_confianza\"}"}
+{"id": 10, "run_id": "run-c2_baja_confianza-20261114T032255", "timestamp": 1794626636.081641, "kind": "source_closed", "detail_json": "{\"frames\": 240}"}

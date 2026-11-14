@@ -1,0 +1,3 @@
+{"id": 4, "run_id": "run-referencia-20261114T031049", "timestamp": 1794625850.0800197, "kind": "rule_disabled", "detail_json": "{\"reason\": \"referencia no disponible\", \"rule\": \"sustained_change\"}"}
+{"id": 5, "run_id": "run-referencia-20261114T031049", "timestamp": 1794625850.086432, "kind": "source_opened", "detail_json": "{\"files\": 240, \"fps\": 4.0, \"kind\": \"sequence\", \"path\": \"data/escenarios/referencia\"}"}
+{"id": 6, "run_id": "run-referencia-20261114T031049", "timestamp": 1794625910.088295, "kind": "source_closed", "detail_json": "{\"frames\": 240}"}

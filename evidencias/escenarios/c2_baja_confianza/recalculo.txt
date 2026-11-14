@@ -1,0 +1,9 @@
+Corrida run-c2_baja_confianza-20261114T032255  config mon-v1-f63818a0  commit 3a0b5da8b820b70852d1d4a1408a2c15b5c713f1
+métrica                                     reportado    recalculado  estado
+G1-tiempo-inferencia-p95                       34.057         34.057  OK
+G2-fps-captura                                3.99999        3.99999  OK
+G3-cpu-proceso                                 53.515         53.515  OK
+G4-proporcion-baja-confianza                 0.641667       0.641667  OK
+G5-cobertura-trazabilidad                           1              1  OK
+G6-version-esperada-vs-reportada                    1              1  OK
+G7-alertas-activas                                  0              0  OK

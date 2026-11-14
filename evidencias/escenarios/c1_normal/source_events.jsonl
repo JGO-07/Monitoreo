@@ -1,0 +1,2 @@
+{"id": 7, "run_id": "run-c1_normal-20261114T032144", "timestamp": 1794626504.6980894, "kind": "source_opened", "detail_json": "{\"files\": 240, \"fps\": 4.0, \"kind\": \"sequence\", \"path\": \"data/escenarios/c1_normal\"}"}
+{"id": 8, "run_id": "run-c1_normal-20261114T032144", "timestamp": 1794626564.699785, "kind": "source_closed", "detail_json": "{\"frames\": 240}"}

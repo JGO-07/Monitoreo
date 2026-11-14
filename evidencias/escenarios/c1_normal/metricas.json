@@ -1,0 +1,412 @@
+{
+  "run_id": "run-c1_normal-20261114T032144",
+  "config_ref": "mon-v1-f63818a0",
+  "model_ref": "mobilenet_v3_large/IMAGENET1K_V2@sha256:5c1a416349c4",
+  "git_commit": "3a0b5da8b820b70852d1d4a1408a2c15b5c713f1",
+  "context": {
+    "declared_fps": 4.0,
+    "expected_model_ref": "mobilenet_v3_large/IMAGENET1K_V2@sha256:5c1a416349c4"
+  },
+  "metrics": {
+    "G1-tiempo-inferencia-p95": {
+      "group": "G1",
+      "base": true,
+      "name": "Tiempo de inferencia p95",
+      "unit": "ms",
+      "value": 32.86930499925802,
+      "n": 120,
+      "p50": 27.786400001787115,
+      "max": 188.76589999854332,
+      "query": "SELECT event_id, inference_ms FROM events WHERE run_id=? AND status='ok' AND inference_ms IS NOT NULL",
+      "evidence_ids": [
+        "evt-c1_normal-20261114T032144-000036",
+        "evt-c1_normal-20261114T032144-000000",
+        "evt-c1_normal-20261114T032144-000126"
+      ],
+      "status": "ok"
+    },
+    "G1-throughput": {
+      "group": "G1",
+      "base": false,
+      "name": "Throughput de inferencias",
+      "unit": "inferencias/s",
+      "value": 2.0010127055814904,
+      "n": 120,
+      "span_s": 59.469887256622314,
+      "query": "SELECT event_id, done_at FROM events WHERE run_id=? AND status='ok' ORDER BY done_at",
+      "evidence_ids": [
+        "evt-c1_normal-20261114T032144-000000",
+        "evt-c1_normal-20261114T032144-000238"
+      ],
+      "status": "ok"
+    },
+    "G1-tasa-errores": {
+      "group": "G1",
+      "base": false,
+      "name": "Tasa de errores de inferencia",
+      "unit": "proporción",
+      "value": 0.0,
+      "n": 120,
+      "by_status": {
+        "ok": 120
+      },
+      "query": "SELECT status, COUNT(*) n FROM events WHERE run_id=? GROUP BY status",
+      "status": "ok"
+    },
+    "G2-fps-captura": {
+      "group": "G2",
+      "base": true,
+      "name": "FPS de captura",
+      "unit": "frames/s",
+      "value": 3.9999721959981343,
+      "n": 240,
+      "span_s": 59.750415325164795,
+      "declared_fps": 4.0,
+      "max_interval_s": 0.2510530948638916,
+      "query": "SELECT frame_id, received_at FROM frames WHERE run_id=? AND outcome != 'read_error' ORDER BY seq",
+      "evidence_ids": [
+        "run-c1_normal-20261114T032144-f000000",
+        "run-c1_normal-20261114T032144-f000239"
+      ],
+      "status": "ok"
+    },
+    "G2-frames-descartados": {
+      "group": "G2",
+      "base": false,
+      "name": "Frames descartados por la aplicación",
+      "unit": "proporción",
+      "value": 0.5,
+      "n": 240,
+      "by_reason": {
+        "dropped_sampling": {
+          "n": 120,
+          "rate": 0.5
+        },
+        "inferred": {
+          "n": 120,
+          "rate": 0.5
+        }
+      },
+      "query": "SELECT outcome, COUNT(*) n FROM frames WHERE run_id=? GROUP BY outcome",
+      "status": "ok"
+    },
+    "G2-latencia-e2e-p95": {
+      "group": "G2",
+      "base": false,
+      "name": "Latencia de extremo a extremo p95",
+      "unit": "ms",
+      "value": 41.54156446456909,
+      "n": 120,
+      "p50": 36.39185428619385,
+      "query": "SELECT event_id, e2e_ms FROM events WHERE run_id=? AND status='ok'",
+      "evidence_ids": [
+        "evt-c1_normal-20261114T032144-000036",
+        "evt-c1_normal-20261114T032144-000000",
+        "evt-c1_normal-20261114T032144-000126"
+      ],
+      "status": "ok"
+    },
+    "G3-cpu-proceso": {
+      "group": "G3",
+      "base": true,
+      "name": "CPU del proceso (media)",
+      "unit": "% de un núcleo",
+      "value": 53.675,
+      "n": 60,
+      "max": 61.1,
+      "query": "SELECT id, timestamp, process_cpu_pct FROM resource_samples WHERE run_id=? ORDER BY timestamp",
+      "evidence_ids": [
+        121,
+        180
+      ],
+      "status": "ok"
+    },
+    "G3-ram-proceso": {
+      "group": "G3",
+      "base": false,
+      "name": "RAM del proceso (máximo)",
+      "unit": "MB",
+      "value": 359.20703125,
+      "n": 60,
+      "mean": 358.1842447916667,
+      "query": "SELECT process_rss_mb FROM resource_samples WHERE run_id=?",
+      "status": "ok"
+    },
+    "G4-proporcion-baja-confianza": {
+      "group": "G4",
+      "base": true,
+      "name": "Proporción de baja confianza",
+      "unit": "proporción",
+      "value": 0.4,
+      "n": 120,
+      "n_low": 48,
+      "by_zone": {
+        "doubt": 31,
+        "low": 48,
+        "accepted": 41
+      },
+      "reference_low_rate": 0.275,
+      "query": "SELECT event_id, score, zone FROM events WHERE run_id=? AND status='ok' AND score IS NOT NULL",
+      "evidence_ids": [
+        "evt-c1_normal-20261114T032144-000004",
+        "evt-c1_normal-20261114T032144-000006",
+        "evt-c1_normal-20261114T032144-000030",
+        "evt-c1_normal-20261114T032144-000032",
+        "evt-c1_normal-20261114T032144-000034"
+      ],
+      "status": "ok"
+    },
+    "G4-predicciones-por-clase": {
+      "group": "G4",
+      "base": false,
+      "name": "Predicciones por clase",
+      "unit": "conteo por clase",
+      "value": 24,
+      "n": 120,
+      "distribution": [
+        {
+          "class_name": "sunglass",
+          "n": 22,
+          "share": 0.18333333333333332
+        },
+        {
+          "class_name": "paper towel",
+          "n": 20,
+          "share": 0.16666666666666666
+        },
+        {
+          "class_name": "envelope",
+          "n": 14,
+          "share": 0.11666666666666667
+        },
+        {
+          "class_name": "space bar",
+          "n": 10,
+          "share": 0.08333333333333333
+        },
+        {
+          "class_name": "toilet tissue",
+          "n": 8,
+          "share": 0.06666666666666667
+        },
+        {
+          "class_name": "notebook",
+          "n": 8,
+          "share": 0.06666666666666667
+        },
+        {
+          "class_name": "carton",
+          "n": 7,
+          "share": 0.058333333333333334
+        },
+        {
+          "class_name": "sunglasses",
+          "n": 4,
+          "share": 0.03333333333333333
+        },
+        {
+          "class_name": "ladle",
+          "n": 3,
+          "share": 0.025
+        },
+        {
+          "class_name": "cradle",
+          "n": 3,
+          "share": 0.025
+        },
+        {
+          "class_name": "wing",
+          "n": 2,
+          "share": 0.016666666666666666
+        },
+        {
+          "class_name": "toaster",
+          "n": 2,
+          "share": 0.016666666666666666
+        },
+        {
+          "class_name": "mouse",
+          "n": 2,
+          "share": 0.016666666666666666
+        },
+        {
+          "class_name": "microphone",
+          "n": 2,
+          "share": 0.016666666666666666
+        },
+        {
+          "class_name": "laptop",
+          "n": 2,
+          "share": 0.016666666666666666
+        }
+      ],
+      "query": "SELECT class_name, COUNT(*) n FROM events WHERE run_id=? AND status='ok' GROUP BY class_name ORDER BY n DESC",
+      "status": "ok"
+    },
+    "G4-psi-confianza-vs-referencia": {
+      "group": "G4",
+      "base": false,
+      "name": "PSI de la distribución de confianza vs referencia",
+      "unit": "PSI",
+      "value": 0.379459649485364,
+      "n": 120,
+      "reference_n": 120,
+      "bins": [
+        {
+          "bin": "[0.0,0.1)",
+          "ref": 0.18333333333333332,
+          "run": 0.20833333333333334
+        },
+        {
+          "bin": "[0.1,0.2)",
+          "ref": 0.175,
+          "run": 0.30833333333333335
+        },
+        {
+          "bin": "[0.2,0.3)",
+          "ref": 0.125,
+          "run": 0.09166666666666666
+        },
+        {
+          "bin": "[0.3,0.4)",
+          "ref": 0.2,
+          "run": 0.05
+        },
+        {
+          "bin": "[0.4,0.5)",
+          "ref": 0.16666666666666666,
+          "run": 0.2
+        },
+        {
+          "bin": "[0.5,0.6)",
+          "ref": 0.11666666666666667,
+          "run": 0.075
+        },
+        {
+          "bin": "[0.6,0.7)",
+          "ref": 0.016666666666666666,
+          "run": 0.058333333333333334
+        },
+        {
+          "bin": "[0.7,0.8)",
+          "ref": 0.016666666666666666,
+          "run": 0.008333333333333333
+        },
+        {
+          "bin": "[0.8,0.9)",
+          "ref": 0.0,
+          "run": 0.0
+        },
+        {
+          "bin": "[0.9,1.0)",
+          "ref": 0.0,
+          "run": 0.0
+        }
+      ],
+      "query": "SELECT score FROM events WHERE run_id=? AND status='ok' AND score IS NOT NULL",
+      "status": "ok",
+      "interpretation": "PSI < 0.1 estable; 0.1–0.25 cambio moderado; > 0.25 cambio importante (convención usual; describe la distribución de salidas, no calidad)."
+    },
+    "G5-cobertura-trazabilidad": {
+      "group": "G5",
+      "base": true,
+      "name": "Cobertura de trazabilidad",
+      "unit": "proporción",
+      "value": 1.0,
+      "n": 120,
+      "complete": 120,
+      "incomplete": [],
+      "query": "SELECT e.*, f.event_id AS frame_event_id, c.config_ref AS cfg_exists FROM events e LEFT JOIN frames f ON f.frame_id=e.frame_id LEFT JOIN configs c ON c.config_ref=e.config_ref WHERE e.run_id=?",
+      "status": "ok"
+    },
+    "G5-imagenes-vinculadas": {
+      "group": "G5",
+      "base": false,
+      "name": "Imágenes vinculadas válidas",
+      "unit": "proporción",
+      "value": 1.0,
+      "n": 62,
+      "valid": 62,
+      "by_zone": {
+        "doubt": 11,
+        "low": 48,
+        "accepted": 3
+      },
+      "query": "SELECT event_id, zone, image_ref, image_sha256 FROM events WHERE run_id=? AND image_ref IS NOT NULL",
+      "evidence_ids": [
+        "evt-c1_normal-20261114T032144-000000",
+        "evt-c1_normal-20261114T032144-000004",
+        "evt-c1_normal-20261114T032144-000006",
+        "evt-c1_normal-20261114T032144-000010",
+        "evt-c1_normal-20261114T032144-000028"
+      ],
+      "status": "ok"
+    },
+    "G5-entradas-invalidas": {
+      "group": "G5",
+      "base": false,
+      "name": "Entradas inválidas",
+      "unit": "proporción",
+      "value": 0.0,
+      "n": 240,
+      "invalid": 0,
+      "query": "SELECT outcome, COUNT(*) n FROM frames WHERE run_id=? GROUP BY outcome",
+      "status": "ok"
+    },
+    "G6-version-esperada-vs-reportada": {
+      "group": "G6",
+      "base": true,
+      "name": "Versión esperada frente a reportada",
+      "unit": "proporción",
+      "value": 1.0,
+      "n": 120,
+      "expected_model_ref": "mobilenet_v3_large/IMAGENET1K_V2@sha256:5c1a416349c4",
+      "reported": {
+        "mobilenet_v3_large/IMAGENET1K_V2@sha256:5c1a416349c4": 120
+      },
+      "query": "SELECT model_ref, COUNT(*) n FROM events WHERE run_id=? GROUP BY model_ref",
+      "status": "ok"
+    },
+    "G6-tiempo-ultimo-reporte": {
+      "group": "G6",
+      "base": false,
+      "name": "Tiempo desde el último reporte por fuente",
+      "unit": "s",
+      "value": 0.6762340068817139,
+      "n": 1,
+      "per_source": [
+        {
+          "source_id": "webcam-escritorio-01",
+          "n": 120,
+          "age_s_at_run_end": 0.6762340068817139
+        }
+      ],
+      "query": "SELECT source_id, MAX(timestamp) last_ts, COUNT(*) n FROM events WHERE run_id=? GROUP BY source_id",
+      "status": "ok"
+    },
+    "G7-alertas-activas": {
+      "group": "G7",
+      "base": true,
+      "name": "Alertas activas",
+      "unit": "alertas",
+      "value": 0,
+      "n": 0,
+      "fired": 0,
+      "max_simultaneous": 0,
+      "active_alert_ids": [],
+      "by_rule": {},
+      "query": "SELECT alert_id, rule_id, severity, timestamp, resolved_at, status FROM alerts WHERE run_id=? ORDER BY timestamp",
+      "status": "ok"
+    },
+    "G7-tiempo-deteccion": {
+      "group": "G7",
+      "base": false,
+      "name": "Tiempo de detección",
+      "unit": "s",
+      "value": null,
+      "n": 0,
+      "query": "SELECT alert_id, timestamp FROM alerts WHERE run_id=? AND rule_id=? ORDER BY timestamp LIMIT 1",
+      "status": "sin_condicion_declarada"
+    }
+  }
+}

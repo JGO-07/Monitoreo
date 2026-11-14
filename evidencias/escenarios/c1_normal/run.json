@@ -1,0 +1,223 @@
+{
+  "run_id": "run-c1_normal-20261114T032144",
+  "scenario": "c1_normal",
+  "started_at": 1794626504.658067,
+  "ended_at": 1794626564.8787286,
+  "config_ref": "mon-v1-f63818a0",
+  "model_ref": "mobilenet_v3_large/IMAGENET1K_V2@sha256:5c1a416349c4",
+  "source_id": "webcam-escritorio-01",
+  "reference_ref": "ref-28147cbc",
+  "git_commit": "3a0b5da8b820b70852d1d4a1408a2c15b5c713f1",
+  "git_dirty": 0,
+  "status": "completed",
+  "notes": "C1 · Operación normal. Grabación distinta de la referencia, misma escena y condiciones normales. Esperado: inferencias reales mayoritariamente en zonas accepted/doubt, sin alerta de baja confianza ni de cambio sostenido (las reglas se evalúan; no se fabrican estados).",
+  "model": {
+    "architecture": "mobilenet_v3_large",
+    "environment": {
+      "cpu_count": 12,
+      "device": "cpu",
+      "machine": "AMD64",
+      "os": "Windows 11 (10.0.26300)",
+      "processor": "AMD64 Family 25 Model 80 Stepping 0, AuthenticAMD",
+      "python": "3.13.15",
+      "torch": "2.15.0+cpu",
+      "torch_threads": 2,
+      "torchvision": "0.29.2+cpu"
+    },
+    "model_ref": "mobilenet_v3_large/IMAGENET1K_V2@sha256:5c1a416349c4",
+    "num_classes": 1000,
+    "output": "softmax 1000 clases (multiclase, una etiqueta por imagen); score = prob. top-1",
+    "preprocessing": {
+      "center_crop": 224,
+      "color": "BGR->RGB",
+      "interpolation": "bilinear",
+      "mean": [
+        0.485,
+        0.456,
+        0.406
+      ],
+      "resize_short_side": 232,
+      "std": [
+        0.229,
+        0.224,
+        0.225
+      ]
+    },
+    "task": "classification",
+    "weights": "torchvision MobileNet_V3_Large_Weights.IMAGENET1K_V2",
+    "weights_file": "models/mobilenet_v3_large-5c1a4163.pth",
+    "weights_sha256": "5c1a416349c4cf298f2a6a5e2600ed0ee55e604713578f5e74e6bc8bcaef7997",
+    "weights_url": "https://download.pytorch.org/models/mobilenet_v3_large-5c1a4163.pth"
+  },
+  "source": {
+    "device": 0,
+    "duration_s": null,
+    "fps": 4.0,
+    "kind": "sequence",
+    "loop": false,
+    "max_frames": null,
+    "path": "data/escenarios/c1_normal",
+    "reconnect_attempts": 3,
+    "reconnect_backoff_s": 1.0,
+    "source_id": "webcam-escritorio-01"
+  },
+  "reference": {
+    "accepted_rate": 0.31666666666666665,
+    "config_ref": "mon-v1-f63818a0",
+    "doubt_rate": 0.4083333333333333,
+    "histogram": {
+      "counts": [
+        22,
+        21,
+        15,
+        24,
+        20,
+        14,
+        2,
+        2,
+        0,
+        0
+      ],
+      "edges": [
+        0.0,
+        0.1,
+        0.2,
+        0.3,
+        0.4,
+        0.5,
+        0.6,
+        0.7,
+        0.8,
+        0.9,
+        1.0
+      ]
+    },
+    "low_rate": 0.275,
+    "mean_score": 0.30043335,
+    "model_ref": "mobilenet_v3_large/IMAGENET1K_V2@sha256:5c1a416349c4",
+    "n_eligible": 120,
+    "n_events": 120,
+    "population": "eventos status=ok con score top-1 (clasificación, unidad = frame inferido)",
+    "quantiles": {
+      "p05": 0.05852375,
+      "p10": 0.0672344,
+      "p25": 0.13095700000000002,
+      "p50": 0.3097485,
+      "p75": 0.46364649999999996,
+      "p90": 0.5250863,
+      "p95": 0.5335323499999999
+    },
+    "reference_id": "referencia-run-referencia-20261114T031049",
+    "run_id": "run-referencia-20261114T031049",
+    "scenario": "referencia",
+    "source_id": "webcam-escritorio-01",
+    "thresholds": {
+      "lower": 0.15,
+      "upper": 0.4
+    },
+    "top_classes": [
+      {
+        "class_name": "toilet tissue",
+        "n": 25
+      },
+      {
+        "class_name": "space bar",
+        "n": 19
+      },
+      {
+        "class_name": "sunglass",
+        "n": 16
+      },
+      {
+        "class_name": "paper towel",
+        "n": 7
+      },
+      {
+        "class_name": "envelope",
+        "n": 6
+      },
+      {
+        "class_name": "nail",
+        "n": 6
+      },
+      {
+        "class_name": "notebook",
+        "n": 5
+      },
+      {
+        "class_name": "refrigerator",
+        "n": 5
+      },
+      {
+        "class_name": "computer keyboard",
+        "n": 4
+      },
+      {
+        "class_name": "mouse",
+        "n": 4
+      }
+    ],
+    "window_low_rates": {
+      "max": 0.45,
+      "mean": 0.275,
+      "n_windows_sufficient": 6
+    }
+  },
+  "config_canonical": {
+    "alerts": {
+      "insufficient_data": {
+        "consecutive_windows": 2,
+        "rule_id": "evidencia-insuficiente-v1",
+        "severity": "info",
+        "suggested_action": "Verificar que la fuente siga entregando frames (conexión, cámara, proceso). Sin observaciones suficientes no se puede afirmar operación normal."
+      },
+      "low_confidence": {
+        "consecutive_windows": 1,
+        "critical_low_rate": 0.85,
+        "min_low_rate": 0.6,
+        "rule_id": "baja-confianza-v1",
+        "severity": "warning",
+        "suggested_action": "Revisar las capturas de baja confianza de la ventana: iluminación, oclusión, enfoque o encuadre de la cámara; confirmar que el preprocesamiento y el modelo son los esperados."
+      },
+      "sustained_change": {
+        "consecutive_windows": 3,
+        "rule_id": "cambio-sostenido-v1",
+        "severity": "warning",
+        "suggested_action": "Posible cambio de condiciones respecto de la referencia. Comparar la distribución de confianza y las capturas con la referencia; investigar cambios de escena, cámara o versión. La confianza no confirma drift ni pérdida de calidad.",
+        "tolerance": 0.25
+      }
+    },
+    "capture": {
+      "accepted_every_n": 15,
+      "doubt_every_n": 3,
+      "jpeg_quality": 90,
+      "low_every_n": 1
+    },
+    "config_id": "mon-v1",
+    "model": {
+      "expected_model_ref": "mobilenet_v3_large/IMAGENET1K_V2@sha256:5c1a416349c4",
+      "num_threads": 2,
+      "weights_file": "models/mobilenet_v3_large-5c1a4163.pth"
+    },
+    "reference": {
+      "file": "config/referencia.json"
+    },
+    "resources": {
+      "sample_interval_s": 1.0
+    },
+    "sampling": {
+      "infer_every_n": 2,
+      "queue_max": 8
+    },
+    "thresholds": {
+      "lower": 0.15,
+      "upper": 0.4
+    },
+    "windows": {
+      "grace_s": 1.5,
+      "min_observations": 10,
+      "size_s": 10
+    }
+  },
+  "store_db": "monitoreo.db"
+}

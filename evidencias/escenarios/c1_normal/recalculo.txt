@@ -1,0 +1,9 @@
+Corrida run-c1_normal-20261114T032144  config mon-v1-f63818a0  commit 3a0b5da8b820b70852d1d4a1408a2c15b5c713f1
+métrica                                     reportado    recalculado  estado
+G1-tiempo-inferencia-p95                      32.8693        32.8693  OK
+G2-fps-captura                                3.99997        3.99997  OK
+G3-cpu-proceso                                 53.675         53.675  OK
+G4-proporcion-baja-confianza                      0.4            0.4  OK
+G5-cobertura-trazabilidad                           1              1  OK
+G6-version-esperada-vs-reportada                    1              1  OK
+G7-alertas-activas                                  0              0  OK
